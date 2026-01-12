@@ -1,0 +1,122 @@
+/* GlobalNav - Apple Store Style */
+.globalnav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  height: var(--nav-height);
+  background: var(--color-nav-bg);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+.globalnav-placeholder {
+  height: var(--nav-height);
+}
+
+.globalnav-content {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 0 var(--content-padding);
+  height: 100%;
+}
+
+.globalnav-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  gap: 8px;
+}
+
+.globalnav-item {
+  display: flex;
+  align-items: center;
+}
+
+/* Logo */
+.globalnav-item-logo {
+  flex-shrink: 0;
+}
+
+.globalnav-link-logo {
+  display: flex;
+  align-items: center;
+}
+
+.globalnav-logo-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* Menu */
+.globalnav-menu {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.globalnav-menu-list {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.globalnav-item-menu .globalnav-link {
+  padding: 0 12px;
+}
+
+.globalnav-link {
+  display: flex;
+  align-items: center;
+  height: var(--nav-height);
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.8);
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity var(--transition-fast);
+}
+
+.globalnav-link:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.globalnav-link-text {
+  white-space: nowrap;
+}
+
+/* Icons */
+.globalnav-search,
+.globalnav-bag {
+  flex-shrink: 0;
+}
+
+.globalnav-link-search,
+.globalnav-link-bag {
+  padding: 0 8px;
+}
+
+.globalnav-link-search svg,
+.globalnav-link-bag svg {
+  display: block;
+}
+
+/* Mobile Responsive */
+@media (max-width: 833px) {
+  .globalnav-menu-list {
+    display: none;
+  }
+  
+  .globalnav-list {
+    justify-content: space-between;
+  }
+  
+  .globalnav-menu {
+    display: none;
+  }
+}

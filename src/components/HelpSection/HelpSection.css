@@ -1,0 +1,81 @@
+/* Help Section - Apple Store Style */
+.help-section {
+  margin-top: 80px;
+  padding-bottom: 80px;
+}
+
+.help-section .section-header {
+  margin-bottom: 32px;
+}
+
+.help-section .headline {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.125;
+}
+
+.headline-primary {
+  color: var(--color-text-primary);
+}
+
+.headline-secondary {
+  color: var(--color-text-secondary);
+}
+
+.help-blocks {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.help-block {
+  background: var(--color-promo-bg);
+  border-radius: var(--radius-large);
+  padding: 32px;
+  text-align: center;
+  transition: transform var(--transition-normal);
+}
+
+.help-block:hover {
+  transform: scale(1.01);
+}
+
+.help-block-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.help-block-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 16px;
+}
+
+.help-block-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.help-block-title {
+  font-size: 21px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 8px;
+}
+
+.help-block-text {
+  font-size: 14px;
+  color: var(--color-link);
+  margin: 0;
+}
+
+@media (max-width: 734px) {
+  .help-section .headline {
+    font-size: 28px;
+  }
+  
+  .help-block {
+    padding: 24px;
+  }
+}

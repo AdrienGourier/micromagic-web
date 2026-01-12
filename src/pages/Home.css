@@ -1,0 +1,83 @@
+/* Home Page - Apple Store Style */
+.store-home {
+  min-height: 100vh;
+}
+
+/* Store Title */
+.store-title-section {
+  padding: 40px 0 20px;
+}
+
+.store-title {
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.003em;
+  line-height: 1.0834;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+@media (min-width: 1069px) {
+  .store-title {
+    font-size: 56px;
+    line-height: 1.07143;
+  }
+}
+
+@media (max-width: 734px) {
+  .store-title {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+}
+
+/* Products Section */
+.products-section {
+  margin-top: 32px;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 734px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Latest Section */
+.latest-section {
+  margin-top: 60px;
+}
+
+.latest-section .section-header {
+  margin-bottom: 32px;
+}
+
+.latest-section .headline {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.125;
+}
+
+.headline-primary {
+  color: var(--color-text-primary);
+}
+
+.headline-secondary {
+  color: var(--color-text-secondary);
+}
+
+.featured-blocks {
+  display: grid;
+  gap: 16px;
+}
+
+@media (max-width: 734px) {
+  .latest-section .headline {
+    font-size: 28px;
+  }
+}
