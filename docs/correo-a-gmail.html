@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Redirigir el correo a Gmail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --papel:#e4e5e0; --caja:#eff0ec; --linea:#a7aca5; --suave:#6d736c;
+    --tinta:#000; --alerta:#c4341f; --bien:#1d7a3e; --agua:#1e6fa8;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme=light]){
+      --papel:#14161a; --caja:#1c1f24; --linea:#3a3f45; --suave:#9aa199;
+      --tinta:#f2f3ef; --alerta:#ef6b53; --bien:#5fbd7f; --agua:#6cb2e4;
+    }
+  }
+  :root[data-theme=dark]{
+    --papel:#14161a; --caja:#1c1f24; --linea:#3a3f45; --suave:#9aa199;
+    --tinta:#f2f3ef; --alerta:#ef6b53; --bien:#5fbd7f; --agua:#6cb2e4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--papel); color:var(--tinta);
+       font-family:Archivo,system-ui,-apple-system,sans-serif; font-size:17px;
+       line-height:1.6; -webkit-font-smoothing:antialiased}
+  .envoltorio{width:min(100% - 2rem,50rem); margin-inline:auto; padding:2.5rem 0 5rem}
+  h1{font-variation-settings:'wdth' 115,'wght' 800; font-size:clamp(2rem,6vw,3rem);
+     line-height:1.05; letter-spacing:-.015em; margin:0 0 .3em}
+  .entradilla{color:var(--suave); max-width:48ch; margin:0 0 1.5rem}
+  h2{font-variation-settings:'wdth' 108,'wght' 700; font-size:1.35rem; margin:0}
+
+  .aviso{border:2px solid var(--alerta); padding:.9rem 1.1rem; margin-bottom:1.2rem}
+  .aviso strong{color:var(--alerta)}
+  .aviso--ok{border-color:var(--bien)} .aviso--ok strong{color:var(--bien)}
+
+  .paso{border-top:3px solid var(--tinta); padding-top:1rem; margin-top:2.5rem}
+  .paso__num{font-variation-settings:'wdth' 100,'wght' 700; color:var(--suave);
+             font-size:.85rem; display:block; margin-bottom:.2rem}
+  .paso p,.paso ol,.paso ul{max-width:60ch}
+  .paso ol,.paso ul{padding-left:1.2rem} .paso li{margin-bottom:.5rem}
+
+  .ficha{background:var(--caja); border:1px solid var(--linea); padding:1.1rem; margin:1.2rem 0}
+  .ficha__titulo{font-variation-settings:'wdth' 108,'wght' 700; margin:0 0 .8rem; font-size:1.05rem}
+  .campo{display:grid; grid-template-columns:7.5rem 1fr auto; gap:.6rem; align-items:center;
+         padding:.55rem 0; border-top:1px solid var(--linea)}
+  .campo:first-of-type{border-top:0}
+  .campo__et{color:var(--suave); font-size:.85rem}
+  .campo__val{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9rem;
+              word-break:break-all; line-height:1.4}
+  .copiar{font:inherit; font-size:.8rem; font-variation-settings:'wdth' 100,'wght' 700;
+          background:var(--tinta); color:var(--papel); border:2px solid var(--tinta);
+          padding:.35rem .7rem; cursor:pointer; white-space:nowrap}
+  .copiar:hover{background:transparent; color:var(--tinta)}
+  .copiar.hecho{background:var(--bien); border-color:var(--bien); color:#fff}
+  .copiar.manual{background:var(--agua); border-color:var(--agua); color:#fff}
+  .copiar:disabled{opacity:.4; cursor:not-allowed}
+  .campo__val::selection{background:var(--agua); color:#fff}
+  @media (max-width:34rem){
+    .campo{grid-template-columns:1fr; gap:.25rem}
+    .copiar{justify-self:start; margin-top:.3rem}
+  }
+
+  .correo{display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin:1rem 0}
+  .correo input{font:inherit; font-size:1rem; padding:.6rem .8rem; flex:1 1 20rem;
+                border:2px solid var(--tinta); background:var(--caja); color:var(--tinta)}
+  .correo input:invalid:not(:placeholder-shown){border-color:var(--alerta)}
+  .sinCorreo{color:var(--alerta); font-size:.9rem; margin:.4rem 0 0}
+
+  .evitar{border:2px solid var(--alerta); padding:1.1rem; margin:1.2rem 0}
+  .evitar h3{margin:0 0 .6rem; font-size:1.05rem; color:var(--alerta);
+             font-variation-settings:'wdth' 105,'wght' 700}
+  .mal,.bien{font-family:ui-monospace,Menlo,monospace; font-size:.85rem; padding:.45rem .6rem;
+             margin:.35rem 0; word-break:break-all}
+  .mal{background:color-mix(in srgb,var(--alerta) 14%,transparent); border-left:4px solid var(--alerta)}
+  .bien{background:color-mix(in srgb,var(--bien) 14%,transparent); border-left:4px solid var(--bien)}
+
+  .marcha{background:var(--caja); border:2px dashed var(--linea); padding:1rem; margin:1.2rem 0}
+  .marcha code{display:block; margin:.2rem 0}
+
+  ul.dominios{list-style:none; padding:0}
+  ul.dominios li{border-bottom:1px solid var(--linea); padding:.6rem 0;
+                 display:flex; gap:.7rem; align-items:center}
+  ul.dominios input{width:1.15rem; height:1.15rem; accent-color:var(--bien)}
+  ul.dominios code{font-size:.95rem}
+
+  pre{background:var(--caja); border:1px solid var(--linea); padding:.9rem;
+      overflow-x:auto; font-size:.85rem; margin:.8rem 0}
+  code{font-family:ui-monospace,Menlo,monospace}
+  a{color:var(--agua)}
+  .nota{color:var(--suave); font-size:.9rem}
+  footer{margin-top:3.5rem; border-top:1px solid var(--linea); padding-top:1rem;
+         color:var(--suave); font-size:.85rem}
+  :focus-visible{outline:3px solid var(--agua); outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="envoltorio">
+
+  <h1>Redirigir el correo<br>a Gmail</h1>
+  <p class="entradilla">
+    Sacamos la recepción de correo de IONOS y la pasamos a forwardemail.net,
+    que es gratis. A partir de ahí, todo lo que llegue a cualquier dirección de
+    esos dominios acaba en una sola bandeja de Gmail, y los buzones de IONOS
+    —24 € al mes— se pueden cancelar.
+  </p>
+
+  <div class="aviso aviso--ok">
+    <strong>Esto ya funciona en tu propia cuenta.</strong>
+    El dominio limpexpress.es usa exactamente este montaje desde hace tiempo.
+    No es un experimento.
+  </div>
+
+  <div class="aviso">
+    <strong>Antes de empezar: rescata el histórico.</strong>
+    Ejecuta <code>./scripts/rescatar-correo.sh</code> y comprueba que los
+    totales cuadran. Los correos viejos viven dentro de los buzones de IONOS,
+    no en el dominio: cuando se cancelen, desaparecen para siempre.
+  </div>
+
+  <section class="paso">
+    <span class="paso__num">Paso 1</span>
+    <h2>Crear la cuenta de Gmail del negocio</h2>
+    <p>
+      Una cuenta nueva, solo para esto. Así el correo del negocio no se mezcla
+      con el tuyo personal y se la puedes dar a tu padre sin darle acceso a nada
+      más.
+    </p>
+    <p class="nota">Créala en gmail.com. Yo no puedo crear cuentas.</p>
+
+    <div class="correo">
+      <label for="gmail" class="campo__et">Escríbela aquí:</label>
+      <input id="gmail" type="email" placeholder="micromagic.negocio@gmail.com"
+             autocomplete="off" spellcheck="false">
+    </div>
+    <p class="nota">
+      Los valores de abajo se rellenan solos con lo que escribas. No se envía a
+      ninguna parte: esta página no tiene servidor.
+    </p>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 2</span>
+    <h2>Apuntar el correo que hay ahora</h2>
+    <p>
+      Vamos a <strong>borrar</strong> registros, no solo a añadirlos. Antes,
+      guarda esto por si hubiera que dar marcha atrás:
+    </p>
+    <div class="marcha">
+      <strong>Los MX actuales de IONOS, en los tres dominios:</strong>
+      <code>MX · prioridad 10 · mx00.ionos.es</code>
+      <code>MX · prioridad 10 · mx01.ionos.es</code>
+      <p class="nota" style="margin:.5rem 0 0">
+        Si algo sale mal, vuelves a poner estos dos y el correo regresa a IONOS
+        en minutos. Por eso no cancelamos los buzones hasta dentro de una semana.
+      </p>
+    </div>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 3</span>
+    <h2>Cambiar los registros, dominio a dominio</h2>
+    <p>
+      En <a href="https://my.ionos.es">my.ionos.es</a> → <strong>Dominios y SSL</strong>
+      → el dominio → <strong>⚙ DNS</strong>. Para cada uno de los tres:
+    </p>
+    <ol>
+      <li><strong>Borra</strong> los dos registros MX que apuntan a <code>mx00.ionos.es</code> y <code>mx01.ionos.es</code>.</li>
+      <li><strong>Añade</strong> los dos MX nuevos y los dos TXT de la ficha.</li>
+      <li>Si ya hay un TXT que empieza por <code>v=spf1</code>, <strong>sustitúyelo</strong> por el nuevo en vez de añadir otro: dos SPF en un dominio lo rompen.</li>
+    </ol>
+
+    <div class="ficha">
+      <p class="ficha__titulo">Los cuatro registros — idénticos en los tres dominios</p>
+      <div class="campo">
+        <span class="campo__et">MX · 10</span>
+        <span class="campo__val" id="mx1">mx1.forwardemail.net</span>
+        <button class="copiar" data-copia="mx1">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">MX · 10</span>
+        <span class="campo__val" id="mx2">mx2.forwardemail.net</span>
+        <button class="copiar" data-copia="mx2">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">TXT</span>
+        <span class="campo__val" id="txtfwd">escribe antes tu Gmail arriba</span>
+        <button class="copiar" data-copia="txtfwd" disabled>Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">TXT · SPF</span>
+        <span class="campo__val" id="txtspf">v=spf1 a mx include:spf.forwardemail.net ~all</span>
+        <button class="copiar" data-copia="txtspf">Copiar</button>
+      </div>
+    </div>
+
+    <p>El nombre de host de los cuatro es la raíz del dominio: <code>@</code>, o
+       déjalo en blanco si el panel no acepta la arroba.</p>
+
+    <ul class="dominios">
+      <li><input type="checkbox" id="d1"><label for="d1"><code>micromagic.tv</code></label></li>
+      <li><input type="checkbox" id="d2"><label for="d2"><code>rhinopaint.es</code></label></li>
+      <li><input type="checkbox" id="d3"><label for="d3"><code>micromagic.es</code></label></li>
+    </ul>
+    <p class="nota">
+      <code>bacoban.es</code> no está en la lista a propósito: ese dominio se
+      deja caducar, así que su correo se pierde salvo lo que rescate el script.
+    </p>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Lo que hay que evitar</span>
+    <h2>Los cuatro fallos que rompen esto</h2>
+
+    <div class="evitar">
+      <h3>1. Dejar los MX viejos puestos</h3>
+      <p>Si conviven con los nuevos a la misma prioridad, el correo seguirá
+         cayendo en IONOS la mitad de las veces y creerás que no funciona.
+         <strong>Los de IONOS se borran.</strong></p>
+    </div>
+
+    <div class="evitar">
+      <h3>2. Tener dos registros SPF</h3>
+      <p>Un dominio solo puede tener uno. Si añades el nuevo sin quitar el viejo,
+         los correos empiezan a ir a spam.</p>
+      <div class="mal">MAL · dos TXT que empiezan por v=spf1</div>
+      <div class="bien">BIEN · un solo TXT v=spf1, el nuevo</div>
+    </div>
+
+    <div class="evitar">
+      <h3>3. Poner el SPF con <code>-all</code></h3>
+      <p>El SPF actual de micromagic.tv y rhinopaint.es autoriza a
+         <code>spf.emdlv.net</code>: <strong>algo externo envía correo como esos
+         dominios</strong> y no sabemos qué es. Por eso el valor de arriba acaba
+         en <code>~all</code> y no en <code>-all</code>: si ese servicio sigue
+         activo, sus envíos se marcarán como sospechosos pero no rebotarán.
+         Cuando averigüemos qué es, lo ajustamos.</p>
+    </div>
+
+    <div class="evitar">
+      <h3>4. Cancelar los buzones el mismo día</h3>
+      <p>El correo tarda en propagar y conviene una semana de rodaje con los
+         buzones de IONOS todavía vivos. Si algo falla, restauras los MX viejos
+         y no se ha perdido nada.</p>
+    </div>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 4</span>
+    <h2>Comprobar que funciona</h2>
+    <p>Espera 15 minutos y, en la terminal:</p>
+<pre><code>for d in micromagic.tv rhinopaint.es micromagic.es; do
+  echo "== $d"; dig +short MX $d; dig +short TXT $d | grep -E 'forward-email|spf1'
+done</code></pre>
+    <p>Los MX deben ser los de forwardemail y los dos TXT deben aparecer. Después,
+       la prueba de verdad:</p>
+    <ul>
+      <li>Manda un correo a <code>info@micromagic.tv</code>.</li>
+      <li>Manda otro a una dirección <strong>inventada</strong> del dominio,
+          por ejemplo <code>loquesea@micromagic.tv</code>. Debe llegar igual:
+          eso confirma que el catch-all recoge también las dos direcciones que
+          no sabemos cuáles son.</li>
+      <li>Repite con los otros dos dominios.</li>
+    </ul>
+    <p>Si los dos llegan a la Gmail nueva, está hecho. Avísame y seguimos con la
+       cancelación.</p>
+  </section>
+
+  <footer>
+    Paso previo: <code>./scripts/rescatar-correo.sh</code><br>
+    Guía hermana, ya completada: <code>docs/dns-ionos.html</code>
+  </footer>
+</div>
+
+<script>
+  var entrada = document.getElementById('gmail');
+  var destino = document.getElementById('txtfwd');
+  var boton = document.querySelector('[data-copia="txtfwd"]');
+
+  entrada.addEventListener('input', function () {
+    var v = entrada.value.trim();
+    var valida = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v);
+    destino.textContent = valida ? 'forward-email=' + v : 'escribe antes tu Gmail arriba';
+    boton.disabled = !valida;
+  });
+
+  document.querySelectorAll('.copiar').forEach(function (b) {
+    var campo = document.getElementById(b.dataset.copia);
+    b.addEventListener('click', function () {
+      if (b.disabled) return;
+      var texto = campo.textContent.trim();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(texto).then(
+          function () { avisar(b, true); },
+          function () { respaldo(b, campo, texto); }
+        );
+      } else { respaldo(b, campo, texto); }
+    });
+  });
+
+  // Abierta como file://, la API del portapapeles puede estar bloqueada.
+  function respaldo(b, campo, texto) {
+    var a = document.createElement('textarea');
+    a.value = texto;
+    a.style.cssText = 'position:fixed;top:-100px;opacity:0';
+    document.body.appendChild(a);
+    a.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(a);
+    if (ok) { avisar(b, true); return; }
+    var sel = window.getSelection(), r = document.createRange();
+    r.selectNodeContents(campo); sel.removeAllRanges(); sel.addRange(r);
+    avisar(b, false);
+  }
+
+  function avisar(b, ok) {
+    if (b.dataset.original === undefined) b.dataset.original = b.textContent;
+    b.textContent = ok ? 'Copiado' : 'Pulsa ⌘C';
+    b.classList.toggle('hecho', ok);
+    b.classList.toggle('manual', !ok);
+    clearTimeout(b._t);
+    b._t = setTimeout(function () {
+      b.textContent = b.dataset.original;
+      b.classList.remove('hecho', 'manual');
+    }, ok ? 1600 : 4000);
+  }
+
+  // Las casillas de los dominios sobreviven a una recarga: es un proceso de
+  // tres pasos repetidos y es fácil perder la cuenta.
+  document.querySelectorAll('ul.dominios input').forEach(function (c) {
+    try { c.checked = localStorage.getItem('dom-' + c.id) === '1'; } catch (e) {}
+    c.addEventListener('change', function () {
+      try { localStorage.setItem('dom-' + c.id, c.checked ? '1' : '0'); } catch (e) {}
+    });
+  });
+</script>
+</body>
+</html>
