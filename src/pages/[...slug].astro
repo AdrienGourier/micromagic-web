@@ -1,0 +1,65 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+
+// 'home' es la portada y la sirve index.astro; el resto conserva su URL
+// de WordPress para no romper lo que Google ya tiene indexado.
+export async function getStaticPaths() {
+  const paginas = await getCollection('paginas', (p) => p.data.slug !== 'home');
+  return paginas.map((pagina) => ({
+    params: { slug: pagina.data.slug },
+    props: { pagina },
+  }));
+}
+
+const { pagina } = Astro.props;
+const { Content } = await render(pagina);
+
+const descripcion =
+  pagina.data.resumen ||
+  `${pagina.data.titulo} — MICROMAGIC, la auténtica esponja mágica fabricada en España.`;
+---
+
+<Base titulo={`${pagina.data.titulo} — MICROMAGIC`} descripcion={descripcion}>
+  <article class="envoltorio articulo">
+    <h1>{pagina.data.titulo}</h1>
+    <div class="articulo__cuerpo">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .articulo { padding-top: clamp(2rem, 6vw, 4rem); }
+
+  .articulo h1 {
+    font-size: clamp(var(--t-3), 5.5vw, var(--t-5));
+    max-width: 18ch;
+    margin-bottom: 0.6em;
+    padding-bottom: 0.35em;
+    border-bottom: 3px solid var(--tinta);
+  }
+
+  /* El contenido viene de WordPress: puede traer cualquier cosa, así que las
+     reglas se aplican a los elementos, no a clases que el Markdown no tiene. */
+  .articulo__cuerpo :global(h2) {
+    font-size: var(--t-2);
+    margin-top: 1.6em;
+  }
+  .articulo__cuerpo :global(h3),
+  .articulo__cuerpo :global(h4) {
+    font-size: var(--t-1);
+    margin-top: 1.4em;
+  }
+  .articulo__cuerpo :global(img) {
+    margin: 1.6em 0;
+    border: 1px solid var(--espuma);
+  }
+  .articulo__cuerpo :global(p),
+  .articulo__cuerpo :global(ul) {
+    max-width: var(--medida);
+  }
+  .articulo__cuerpo :global(a) {
+    overflow-wrap: anywhere;
+  }
+</style>
