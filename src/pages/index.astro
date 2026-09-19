@@ -1,0 +1,321 @@
+---
+import Base from '../layouts/Base.astro';
+
+// Fotogramas reales del mismo panel: con el roce y ya limpio, mismo encuadre.
+const SUCIO = '/uploads/2019/02/Fotograma-001-A.jpg';
+const LIMPIO = '/uploads/2019/02/Fotograma-001-B.jpg';
+
+const superficies = [
+  'Baldosas y azulejos',
+  'Persianas',
+  'Mobiliario de plástico',
+  'Tumbonas y sillas',
+  'Aluminios y chapas',
+  'Poliéster',
+  'Asientos de piel',
+  'Encimeras de mármol',
+  'Acero inoxidable',
+  'Superficies pintadas',
+];
+
+const propiedades = [
+  {
+    titulo: 'Solo agua',
+    texto:
+      'Moje la esponja y frote. No hace falta detergente ni ningún producto químico agresivo.',
+  },
+  {
+    titulo: 'No raya',
+    texto:
+      'Las microfibras entran en el microporo y arrastran la suciedad. La abrasión es tan suave que no deja marca en la mayoría de superficies.',
+  },
+  {
+    titulo: 'Aguanta',
+    texto:
+      'La espuma inyectada resiste muchos más usos que los borradores mágicos corrientes antes de deshacerse.',
+  },
+  {
+    titulo: 'Hipoalergénica',
+    texto: 'Antibacteriana, no tóxica y sin olor. Apta para cocinas y zonas de paso.',
+  },
+];
+
+const formatos = [
+  { nombre: 'Blíster de 5 unidades', img: '/uploads/2019/02/esponjas-micromagic.jpg' },
+  { nombre: 'Caja de 4 blísters', img: '/uploads/2019/02/3-2.jpg' },
+  { nombre: 'Caja de 20 blísters', img: '/uploads/2019/02/caja-20-marron.png' },
+  { nombre: 'Caja de 54 blísters', img: '/uploads/2019/02/caja-blanca-nueva.png' },
+];
+---
+
+<Base
+  titulo="MICROMAGIC — la auténtica esponja mágica, fabricada en España"
+  descripcion="Esponja de melamina Basotect fabricada en España desde 2009. Limpia manchas difíciles solo con agua, sin rayar. Formatos para particulares, talleres y distribuidores."
+>
+  <section class="portada">
+    <div class="envoltorio">
+      <h1>Limpia solo<br />con agua.</h1>
+      <p class="portada__entrada">
+        La auténtica esponja mágica: espuma de melamina fabricada en España
+        desde 2009. Sin detergente, sin química, sin rayar.
+      </p>
+    </div>
+
+    <figure class="frote">
+      <img class="frote__limpio" src={LIMPIO} alt="El mismo panel del coche, ya sin la marca." width="1600" height="900" />
+      <canvas class="frote__lienzo" data-sucio={SUCIO} width="1600" height="900" aria-hidden="true"></canvas>
+      <img class="frote__respaldo" src={SUCIO} alt="Panel de coche con un roce de pintura roja y suciedad." width="1600" height="900" />
+      <figcaption class="frote__pie">
+        <span class="frote__instruccion">Pase el dedo o el ratón por encima de la mancha</span>
+        <button class="frote__alterna" type="button" aria-pressed="false">Ver el resultado</button>
+      </figcaption>
+    </figure>
+  </section>
+
+  <section class="envoltorio bloque">
+    <h2>En qué funciona</h2>
+    <p>
+      Micromagic es especialmente eficaz en las superficies que hasta ahora daban
+      más problemas, donde frotar con estropajo dejaba marca:
+    </p>
+    <ul class="superficies">
+      {superficies.map((s) => <li>{s}</li>)}
+    </ul>
+    <p class="nota">
+      En superficies muy delicadas, pruebe antes en una zona pequeña y poco visible.
+    </p>
+  </section>
+
+  <section class="envoltorio bloque">
+    <h2>Por qué no es un borrador mágico cualquiera</h2>
+    <div class="propiedades">
+      {
+        propiedades.map((p) => (
+          <div class="propiedad">
+            <h3>{p.titulo}</h3>
+            <p>{p.texto}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="envoltorio bloque">
+    <h2>Formatos</h2>
+    <p>
+      Del blíster suelto a la caja de 54 para distribución. Díganos qué volumen
+      necesita y le pasamos precio.
+    </p>
+    <ul class="formatos">
+      {
+        formatos.map((f) => (
+          <li class="formato">
+            <img src={f.img} alt={f.nombre} loading="lazy" />
+            <span>{f.nombre}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Base>
+
+<style>
+  .portada { padding-top: clamp(2rem, 7vw, 5rem); }
+
+  h1 {
+    font-variation-settings: 'wdth' 120, 'wght' 900;
+    margin-bottom: 0.25em;
+  }
+
+  .portada__entrada {
+    font-size: clamp(var(--t-0), 2.2vw, var(--t-1));
+    max-width: 34ch;
+    color: var(--espuma-sombra);
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  /* La pasada: el fotograma sucio se borra de verdad sobre el limpio. */
+  .frote {
+    position: relative;
+    margin: 0;
+    width: min(100% - 2rem, 76rem);
+    margin-inline: auto;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--espuma);
+    overflow: hidden;
+    background: var(--panel-claro);
+  }
+  .frote__limpio,
+  .frote__lienzo,
+  .frote__respaldo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .frote__lienzo { touch-action: none; cursor: crosshair; }
+
+  /* Sin JS el visitante ve la foto sucia; con JS, el lienzo la sustituye. */
+  .frote__lienzo { display: none; }
+  .frote.viva .frote__lienzo { display: block; }
+  .frote.viva .frote__respaldo { display: none; }
+
+  .frote__pie {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+    background: color-mix(in srgb, var(--panel) 88%, transparent);
+    border-top: 1px solid var(--espuma);
+    font-size: var(--t--1);
+    flex-wrap: wrap;
+  }
+  .frote__instruccion { color: var(--espuma-sombra); }
+  .frote__alterna {
+    font: inherit;
+    font-variation-settings: 'wdth' 100, 'wght' 700;
+    background: none;
+    border: 1px solid var(--tinta);
+    color: var(--tinta);
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
+  }
+  .frote__alterna:hover { background: var(--tinta); color: var(--panel); }
+
+  .bloque { margin-top: calc(var(--hueco) * 2); }
+
+  .superficies {
+    list-style: none;
+    padding: 0;
+    max-width: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: 0;
+    border-top: 1px solid var(--espuma);
+  }
+  .superficies li {
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--espuma);
+    margin: 0;
+  }
+
+  .nota {
+    color: var(--espuma-sombra);
+    font-size: var(--t--1);
+    margin-top: 1.2em;
+  }
+
+  .propiedades {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--hueco);
+  }
+  /* Las propiedades se separan con una regla, no con tarjetas: la diferencia
+     entre ellas es de contenido, no de jerarquía. */
+  .propiedad { border-top: 3px solid var(--tinta); padding-top: 0.8rem; }
+  .propiedad p { font-size: var(--t--1); color: var(--espuma-sombra); }
+
+  .formatos {
+    list-style: none;
+    padding: 0;
+    max-width: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--hueco);
+  }
+  .formato img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: var(--panel-claro);
+    margin-bottom: 0.6rem;
+  }
+  .formato span { font-size: var(--t--1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .frote__instruccion { display: none; }
+  }
+</style>
+
+<script>
+  const figura = document.querySelector<HTMLElement>('.frote');
+  const lienzo = document.querySelector<HTMLCanvasElement>('.frote__lienzo');
+  const alterna = document.querySelector<HTMLButtonElement>('.frote__alterna');
+  if (figura && lienzo && alterna) {
+    const ctx = lienzo.getContext('2d');
+    const sucio = new Image();
+    sucio.src = lienzo.dataset.sucio!;
+
+    const pintarSucio = () => {
+      if (!ctx) return;
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.clearRect(0, 0, lienzo.width, lienzo.height);
+      ctx.drawImage(sucio, 0, 0, lienzo.width, lienzo.height);
+    };
+
+    sucio.onload = () => {
+      pintarSucio();
+      figura.classList.add('viva');
+    };
+
+    // Brocha de borde difuminado: una esponja no deja un círculo recortado.
+    const RADIO = 85;
+    const marcar = (x: number, y: number) => {
+      if (!ctx) return;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, RADIO);
+      g.addColorStop(0, 'rgba(0,0,0,1)');
+      g.addColorStop(0.6, 'rgba(0,0,0,0.85)');
+      g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(x, y, RADIO, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    let ultimo: { x: number; y: number } | null = null;
+
+    const borrar = (e: PointerEvent) => {
+      if (!ctx) return;
+      const r = lienzo.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / r.width) * lienzo.width;
+      const y = ((e.clientY - r.top) / r.height) * lienzo.height;
+      // Interpolar: al mover rápido, pointermove salta y dejaría huecos.
+      if (ultimo) {
+        const dx = x - ultimo.x;
+        const dy = y - ultimo.y;
+        const pasos = Math.ceil(Math.hypot(dx, dy) / (RADIO / 3));
+        for (let i = 1; i <= pasos; i++) {
+          marcar(ultimo.x + (dx * i) / pasos, ultimo.y + (dy * i) / pasos);
+        }
+      } else {
+        marcar(x, y);
+      }
+      ultimo = { x, y };
+    };
+
+    lienzo.addEventListener('pointermove', borrar);
+    lienzo.addEventListener('pointerdown', borrar);
+    lienzo.addEventListener('pointerup', () => { ultimo = null; });
+    lienzo.addEventListener('pointerleave', () => { ultimo = null; });
+
+    // Alternativa accesible: el mismo resultado sin depender del puntero.
+    let limpio = false;
+    alterna.addEventListener('click', () => {
+      limpio = !limpio;
+      if (limpio) {
+        ctx?.clearRect(0, 0, lienzo.width, lienzo.height);
+      } else {
+        pintarSucio();
+      }
+      alterna.setAttribute('aria-pressed', String(limpio));
+      alterna.textContent = limpio ? 'Ver la mancha' : 'Ver el resultado';
+    });
+  }
+</script>

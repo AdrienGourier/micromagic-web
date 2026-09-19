@@ -1,0 +1,120 @@
+/* MICROMAGIC — sistema visual.
+
+   La paleta sale de las propias fotos del producto: el blanco sucio del panel
+   de coche, el gris de la espuma de melamina, el rojo del roce que se elimina
+   y el azul del agua, que es el único ingrediente que necesita.            */
+
+:root {
+  --panel:  #e4e5e0;   /* superficie a limpiar: fondo de página             */
+  --panel-claro: #eff0ec;
+  --espuma: #a7aca5;   /* gris melamina: reglas, bordes, texto secundario   */
+  --espuma-sombra: #7d837c;
+  --tinta:  #000;      /* negro puro, como la serigrafía del packaging      */
+  --marca:  #c4341f;   /* el rojo del roce: SOLO para lo que se elimina     */
+  --agua:   #1e6fa8;   /* enlaces y acciones                               */
+
+  --medida: 68ch;
+
+  /* Escala tipográfica 1.25 sobre 17px */
+  --t--1: 0.82rem;
+  --t-0:  1.0625rem;
+  --t-1:  1.33rem;
+  --t-2:  1.66rem;
+  --t-3:  2.07rem;
+  --t-4:  2.59rem;
+  --t-5:  3.24rem;
+  --t-6:  4.5rem;
+
+  --hueco: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --panel: #14161a;
+    --panel-claro: #1c1f24;
+    --espuma: #6f756e;
+    --espuma-sombra: #9aa199;
+    --tinta: #f2f3ef;
+    --agua: #6cb2e4;
+  }
+}
+:root[data-theme='dark'] {
+  --panel: #14161a;
+  --panel-claro: #1c1f24;
+  --espuma: #6f756e;
+  --espuma-sombra: #9aa199;
+  --tinta: #f2f3ef;
+  --agua: #6cb2e4;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--panel);
+  color: var(--tinta);
+  font-family: 'Archivo', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+  font-size: var(--t-0);
+  line-height: 1.6;
+  font-variation-settings: 'wdth' 100, 'wght' 400;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Los titulares usan el eje de anchura de Archivo, no otra familia.
+   Es la voz de la marca: condensada y pesada, como el estampado de una caja. */
+h1, h2, h3, .expandida {
+  font-variation-settings: 'wdth' 112, 'wght' 800;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  margin: 0 0 0.4em;
+  text-wrap: balance;
+}
+h1 { font-size: clamp(var(--t-4), 7vw, var(--t-6)); }
+h2 { font-size: clamp(var(--t-2), 4.5vw, var(--t-4)); }
+h3 { font-size: var(--t-1); font-variation-settings: 'wdth' 100, 'wght' 700; }
+
+p { max-width: var(--medida); margin: 0 0 1.1em; }
+
+a { color: var(--agua); text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible {
+  outline: 3px solid var(--agua);
+  outline-offset: 3px;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+ul { max-width: var(--medida); padding-left: 1.1rem; }
+li { margin-bottom: 0.4em; }
+
+strong { font-variation-settings: 'wdth' 100, 'wght' 700; }
+
+hr { border: 0; border-top: 1px solid var(--espuma); margin: var(--hueco) 0; }
+
+.envoltorio {
+  width: min(100% - 2rem, 76rem);
+  margin-inline: auto;
+}
+
+/* Saltar al contenido: primera parada del teclado */
+.saltar {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--tinta);
+  color: var(--panel);
+  padding: 0.7rem 1rem;
+  z-index: 100;
+}
+.saltar:focus { left: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
