@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salir de IONOS — guía completa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --papel:#e4e5e0; --caja:#eff0ec; --linea:#a7aca5; --suave:#6d736c;
+    --tinta:#000; --alerta:#c4341f; --bien:#1d7a3e; --agua:#1e6fa8;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme=light]){
+      --papel:#14161a; --caja:#1c1f24; --linea:#3a3f45; --suave:#9aa199;
+      --tinta:#f2f3ef; --alerta:#ef6b53; --bien:#5fbd7f; --agua:#6cb2e4;
+    }
+  }
+  :root[data-theme=dark]{
+    --papel:#14161a; --caja:#1c1f24; --linea:#3a3f45; --suave:#9aa199;
+    --tinta:#f2f3ef; --alerta:#ef6b53; --bien:#5fbd7f; --agua:#6cb2e4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--papel); color:var(--tinta);
+       font-family:Archivo,system-ui,-apple-system,sans-serif; font-size:17px;
+       line-height:1.6; -webkit-font-smoothing:antialiased}
+  .envoltorio{width:min(100% - 2rem,54rem); margin-inline:auto; padding:2.5rem 0 6rem}
+
+  h1{font-variation-settings:'wdth' 115,'wght' 800; font-size:clamp(2rem,6.5vw,3.2rem);
+     line-height:1.03; letter-spacing:-.015em; margin:0 0 .25em}
+  .entradilla{color:var(--suave); max-width:50ch; margin:0 0 1.5rem}
+  h2{font-variation-settings:'wdth' 108,'wght' 700; font-size:1.4rem; margin:0}
+  h3{font-variation-settings:'wdth' 100,'wght' 700; font-size:1.05rem; margin:1.4rem 0 .4rem}
+
+  /* Barra de avance: es un proceso de varios días, conviene ver dónde se está */
+  .avance{position:sticky; top:0; background:var(--papel); z-index:10;
+          border-bottom:1px solid var(--linea); padding:.7rem 0; margin-bottom:1.5rem}
+  .avance__fila{display:flex; align-items:center; gap:.8rem; font-size:.85rem}
+  .avance__barra{flex:1; height:6px; background:var(--linea); overflow:hidden}
+  .avance__relleno{height:100%; width:0; background:var(--bien); transition:width .25s}
+  .avance__texto{font-variation-settings:'wdth' 100,'wght' 700; white-space:nowrap}
+  .avance button{font:inherit; font-size:.75rem; background:none; border:1px solid var(--linea);
+                 color:var(--suave); padding:.2rem .5rem; cursor:pointer}
+
+  .fase{border-top:3px solid var(--tinta); padding-top:1rem; margin-top:2.8rem}
+  .fase__cab{display:flex; align-items:baseline; gap:.8rem; flex-wrap:wrap}
+  .fase__num{font-variation-settings:'wdth' 100,'wght' 700; color:var(--suave); font-size:.85rem}
+  .quien{font-size:.72rem; font-variation-settings:'wdth' 100,'wght' 700;
+         padding:.15rem .45rem; border:1px solid currentColor}
+  .quien--tu{color:var(--agua)} .quien--yo{color:var(--suave)}
+  .fase p,.fase ol,.fase ul:not(.tareas){max-width:62ch}
+  .fase ol,.fase ul:not(.tareas){padding-left:1.2rem}
+  .fase li{margin-bottom:.45rem}
+
+  ul.tareas{list-style:none; padding:0; margin:1rem 0}
+  ul.tareas li{display:flex; gap:.7rem; align-items:flex-start; padding:.5rem 0;
+               border-bottom:1px solid var(--linea)}
+  ul.tareas input{width:1.2rem; height:1.2rem; margin-top:.2rem; flex:none; accent-color:var(--bien)}
+  ul.tareas label{flex:1; cursor:pointer}
+  ul.tareas input:checked + label{color:var(--suave); text-decoration:line-through}
+
+  .hecho{border:2px solid var(--bien); padding:1rem 1.1rem; margin-bottom:1.5rem}
+  .hecho h2{color:var(--bien); font-size:1.1rem; margin-bottom:.5rem}
+  .hecho ul{margin:0; padding-left:1.1rem; font-size:.92rem; color:var(--suave)}
+
+  .aviso{border:2px solid var(--alerta); padding:.9rem 1.1rem; margin:1.2rem 0}
+  .aviso strong{color:var(--alerta)}
+
+  .ficha{background:var(--caja); border:1px solid var(--linea); padding:1rem; margin:1.1rem 0}
+  .ficha__titulo{font-variation-settings:'wdth' 108,'wght' 700; margin:0 0 .7rem; font-size:1rem}
+  .campo{display:grid; grid-template-columns:8.5rem 1fr auto; gap:.6rem; align-items:center;
+         padding:.5rem 0; border-top:1px solid var(--linea)}
+  .campo:first-of-type{border-top:0}
+  .campo__et{color:var(--suave); font-size:.82rem}
+  .campo__val{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.88rem;
+              word-break:break-all; line-height:1.4}
+  .copiar{font:inherit; font-size:.78rem; font-variation-settings:'wdth' 100,'wght' 700;
+          background:var(--tinta); color:var(--papel); border:2px solid var(--tinta);
+          padding:.3rem .65rem; cursor:pointer; white-space:nowrap}
+  .copiar:hover{background:transparent; color:var(--tinta)}
+  .copiar.ok{background:var(--bien); border-color:var(--bien); color:#fff}
+  .copiar.manual{background:var(--agua); border-color:var(--agua); color:#fff}
+  .campo__val::selection{background:var(--agua); color:#fff}
+  @media (max-width:36rem){
+    .campo{grid-template-columns:1fr; gap:.2rem}
+    .copiar{justify-self:start; margin-top:.3rem}
+  }
+
+  table.t{border-collapse:collapse; width:100%; margin:1rem 0; font-size:.9rem}
+  table.t th,table.t td{border:1px solid var(--linea); padding:.5rem .65rem; text-align:left}
+  table.t th{background:var(--caja); font-variation-settings:'wdth' 100,'wght' 700}
+  table.t td.num{text-align:right; font-family:ui-monospace,Menlo,monospace}
+
+  pre{background:var(--caja); border:1px solid var(--linea); padding:.85rem;
+      overflow-x:auto; font-size:.84rem; margin:.7rem 0}
+  code{font-family:ui-monospace,Menlo,monospace}
+  a{color:var(--agua)}
+  .nota{color:var(--suave); font-size:.89rem}
+  .marcha{background:var(--caja); border:2px dashed var(--linea); padding:.9rem; margin:1.1rem 0}
+  .marcha code{display:block}
+  footer{margin-top:4rem; border-top:1px solid var(--linea); padding-top:1rem;
+         color:var(--suave); font-size:.85rem}
+  :focus-visible{outline:3px solid var(--agua); outline-offset:3px}
+  @media print{.avance{position:static} .copiar{display:none}}
+</style>
+</head>
+<body>
+<div class="envoltorio">
+
+  <div class="avance">
+    <div class="avance__fila">
+      <span class="avance__texto" id="contador">0 de 0</span>
+      <div class="avance__barra"><div class="avance__relleno" id="relleno"></div></div>
+      <button type="button" id="reiniciar">Reiniciar</button>
+    </div>
+  </div>
+
+  <h1>Salir de IONOS</h1>
+  <p class="entradilla">
+    De <strong>63,07 € al mes</strong> a unos 4 € — la web en AWS y el correo en
+    forwardemail. Todo lo que queda por hacer, en orden. Las casillas se guardan
+    solas: puedes dejarlo a medias y volver.
+  </p>
+
+  <div class="hecho">
+    <h2>Ya está hecho</h2>
+    <ul>
+      <li>Backup completo de los 9 sitios y sus bases de datos, verificado, en <code>~/Backups/ionos-2026-09-18</code></li>
+      <li>Borrados del servidor los 5 sitios sin tráfico: de 11,2 GB a 3,7 GB</li>
+      <li><code>micromagic.tv</code> reconstruido y desplegado en AWS, con certificado HTTPS emitido</li>
+      <li>Los dos CNAME de validación, puestos en IONOS</li>
+    </ul>
+  </div>
+
+  <div class="aviso">
+    <strong>Nada de esto ha bajado la factura todavía.</strong>
+    Borrar ficheros no quita cargos: el dinero sale de cancelar líneas en el
+    panel, y eso es la fase 9. Todo lo anterior existe para poder llegar ahí sin
+    perder nada.
+  </div>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Fase 1</span>
+      <span class="quien quien--tu">LO HACES TÚ</span>
+    </div>
+    <h2>Inventariar los buzones</h2>
+    <p>
+      La factura cobra <strong>6 licencias de correo</strong> pero desde fuera
+      solo se ven cuatro direcciones. Las otras dos únicamente aparecen en el
+      panel, y si no las conocemos, su correo se pierde al cancelar.
+    </p>
+    <p>En <a href="https://my.ionos.es">my.ionos.es</a> → <strong>Email</strong>, anota de cada buzón:</p>
+    <ul>
+      <li>La dirección completa</li>
+      <li>Último acceso — dice si alguien lo usa de verdad</li>
+      <li>Espacio ocupado — dice cuánto histórico hay que rescatar</li>
+    </ul>
+    <p>Y para cada uno hace falta su contraseña. Si no la recuerdas,
+       restablécela ahí mismo: ahora es inofensivo, porque la fase 2 va justo después.</p>
+
+    <h3>Las que ya conocemos</h3>
+    <table class="t">
+      <tr><th>Dirección</th><th>De dónde sale</th></tr>
+      <tr><td><code>info@micromagic.tv</code></td><td>admin de WordPress</td></tr>
+      <tr><td><code>administracion@micromagic.tv</code></td><td>WooCommerce · <strong>tendrá buzón real</strong></td></tr>
+      <tr><td><code>info@rhinopaint.es</code></td><td>admin de WordPress · <strong>tendrá buzón real</strong></td></tr>
+      <tr><td><code>info@bacoban.es</code></td><td>admin de WordPress</td></tr>
+    </table>
+
+    <ul class="tareas">
+      <li><input type="checkbox" id="t1a"><label for="t1a">Listadas las 6 direcciones</label></li>
+      <li><input type="checkbox" id="t1b"><label for="t1b">Anotado último acceso y tamaño de cada una</label></li>
+      <li><input type="checkbox" id="t1c"><label for="t1c">Conseguidas las 6 contraseñas</label></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Fase 2</span>
+      <span class="quien quien--yo">LO HAGO YO</span>
+    </div>
+    <h2>Rescatar el histórico</h2>
+    <div class="aviso">
+      <strong>Este es el punto sin retorno del proyecto.</strong>
+      Cuando IONOS cierra un buzón, sus correos no se recuperan por ninguna vía.
+      Nada se cancela hasta que esto esté hecho y comprobado.
+    </div>
+    <p>Crea el fichero de credenciales con una línea por buzón y protégelo:</p>
+<pre><code>nano ~/.ionos-correo
+# una línea por buzón:  direccion:contraseña
+chmod 600 ~/.ionos-correo</code></pre>
+    <p>Luego dímelo y lanzo la descarga. El script se niega a arrancar si el
+       fichero tiene permisos flojos.</p>
+<pre><code>cd ~/cop/micromagic-web
+./scripts/rescatar-correo.sh</code></pre>
+    <p>Baja cada buzón entero a <code>~/Backups/ionos-correo-&lt;fecha&gt;/</code> en
+       formato Maildir, que abre cualquier cliente.</p>
+
+    <ul class="tareas">
+      <li><input type="checkbox" id="t2a"><label for="t2a">Creado <code>~/.ionos-correo</code> con <code>chmod 600</code></label></li>
+      <li><input type="checkbox" id="t2b"><label for="t2b">Descarga ejecutada sin fallos</label></li>
+      <li><input type="checkbox" id="t2c"><label for="t2c"><strong>Los totales cuadran con lo que dice el panel</strong></label></li>
+      <li><input type="checkbox" id="t2d"><label for="t2d">Borradas las credenciales: <code>rm -P ~/.ionos-correo</code></label></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Fase 3</span>
+      <span class="quien quien--tu">LO HACES TÚ</span>
+    </div>
+    <h2>Crear las cuentas nuevas</h2>
+    <ol>
+      <li><strong>Una Gmail del negocio</strong>, en gmail.com. Recibirá todo lo
+          que no tenga buzón propio. Al ser nueva, se la puedes dar a tu padre
+          sin darle acceso a nada tuyo.</li>
+      <li><strong>Una cuenta en <a href="https://forwardemail.net">forwardemail.net</a></strong>
+          con el plan <strong>Enhanced Protection</strong>, 3 $/mes. El plan
+          gratuito solo reenvía: no guarda nada, y necesitamos dos buzones reales.</li>
+    </ol>
+    <p class="nota">Yo no puedo crear cuentas ni pagar suscripciones.</p>
+    <ul class="tareas">
+      <li><input type="checkbox" id="t3a"><label for="t3a">Gmail del negocio creada</label></li>
+      <li><input type="checkbox" id="t3b"><label for="t3b">Cuenta de forwardemail con Enhanced Protection</label></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Fase 4</span>
+      <span class="quien quien--tu">LO HACES TÚ</span>
+    </div>
+    <h2>Configurar los alias en forwardemail</h2>
+    <p>En su panel, <strong>Add Domain</strong> con los tres dominios. Después, en cada uno:</p>
+    <table class="t">
+      <tr><th>Dominio</th><th>Alias</th><th>Qué hace</th></tr>
+      <tr><td><code>micromagic.tv</code></td><td><code>administracion</code></td><td><strong>Buzón real.</strong> Genera y guarda su contraseña</td></tr>
+      <tr><td><code>micromagic.tv</code></td><td><code>*</code></td><td>Reenvía a la Gmail nueva</td></tr>
+      <tr><td><code>rhinopaint.es</code></td><td><code>info</code></td><td><strong>Buzón real.</strong> Genera y guarda su contraseña</td></tr>
+      <tr><td><code>rhinopaint.es</code></td><td><code>*</code></td><td>Reenvía a la Gmail nueva</td></tr>
+      <tr><td><code>micromagic.es</code></td><td><code>*</code></td><td>Reenvía a la Gmail nueva</td></tr>
+    </table>
+    <p>
+      El alias <code>*</code> es el <strong>catch-all</strong>: recoge cualquier
+      dirección del dominio. Es justamente lo que salva las dos direcciones que
+      no sabemos cuáles son.
+    </p>
+    <p class="nota">
+      Un alias puede guardar <em>y</em> reenviar a la vez: si quieres ver también
+      en Gmail lo que entra en los dos buzones reales, añade la Gmail como
+      destino además del almacenamiento.
+    </p>
+    <div class="aviso">
+      <strong>Las contraseñas de los buzones son por alias</strong>, no la de tu
+      cuenta de forwardemail. Es el fallo típico al configurar el correo en el
+      móvil. Guárdalas: hacen falta en las fases 6 y 7.
+    </div>
+    <ul class="tareas">
+      <li><input type="checkbox" id="t4a"><label for="t4a">Los 3 dominios añadidos</label></li>
+      <li><input type="checkbox" id="t4b"><label for="t4b">Los 2 buzones reales creados y sus contraseñas guardadas</label></li>
+      <li><input type="checkbox" id="t4c"><label for="t4c">Los 3 catch-all apuntando a la Gmail</label></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Fase 5</span>
+      <span class="quien quien--tu">LO HACES TÚ</span>
+    </div>
+    <h2>Cambiar el DNS del correo</h2>
+    <p>
+      <a href="https://my.ionos.es">my.ionos.es</a> → <strong>Dominios y SSL</strong>
+      → el dominio → <strong>⚙ DNS</strong>. Aquí, por primera vez,
+      <strong>hay que borrar registros</strong>.
+    </p>
+
+    <div class="marcha">
+      <strong>Guarda esto antes de tocar nada — es tu marcha atrás:</strong>
+      <code>MX · prioridad 10 · mx00.ionos.es</code>
+      <code>MX · prioridad 10 · mx01.ionos.es</code>
+      <p class="nota" style="margin:.4rem 0 0">
+        Si algo sale mal, los vuelves a poner y el correo regresa a IONOS en minutos.
+      </p>
+    </div>
+
+    <p>En cada uno de los tres dominios:</p>
+    <ol>
+      <li><strong>Borra</strong> los MX de <code>mx00.ionos.es</code> y <code>mx01.ionos.es</code></li>
+      <li><strong>Añade</strong> los dos MX nuevos</li>
+      <li>Si ya hay un TXT que empieza por <code>v=spf1</code>, <strong>sustitúyelo</strong>. Nunca dos</li>
+      <li>Añade el <strong>DKIM y el DMARC que genere el panel de forwardemail</strong> (Settings → Outbound SMTP). Son distintos por dominio, por eso no están aquí</li>
+    </ol>
+
+    <div class="ficha">
+      <p class="ficha__titulo">Iguales en los tres dominios · host <code>@</code></p>
+      <div class="campo">
+        <span class="campo__et">MX · prio 0</span>
+        <span class="campo__val" id="v-mx1">mx1.forwardemail.net</span>
+        <button class="copiar" data-c="v-mx1">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">MX · prio 0</span>
+        <span class="campo__val" id="v-mx2">mx2.forwardemail.net</span>
+        <button class="copiar" data-c="v-mx2">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">TXT · SPF</span>
+        <span class="campo__val" id="v-spf">v=spf1 a include:spf.forwardemail.net ~all</span>
+        <button class="copiar" data-c="v-spf">Copiar</button>
+      </div>
+    </div>
+
+    <h3>Los tres errores que rompen esto</h3>
+    <ul>
+      <li><strong>Dejar los MX viejos.</strong> Si conviven, el correo cae en IONOS parte de las veces y parecerá que falla a ratos.</li>
+      <li><strong>Dos registros SPF.</strong> Un dominio solo admite uno; con dos, los correos van a spam.</li>
+      <li><strong>Cambiar <code>~all</code> por <code>-all</code>.</strong> El SPF actual autoriza a <code>spf.emdlv.net</code>: algo externo envía como estos dominios y no sabemos qué es. Con <code>-all</code> esos envíos rebotarían de golpe.</li>
+    </ul>
+    <p class="nota">En el plan de pago <strong>no se pone</strong> ningún TXT
+       <code>forward-email=</code>: los alias viven en el panel. Al terminar,
+       pulsa <strong>Verify Records</strong> en forwardemail.</p>
+
+    <ul class="tareas">
+      <li><input type="checkbox" id="t5a"><label for="t5a"><code>micromagic.tv</code> — MX cambiados y SPF puesto</label></li>
+      <li><input type="checkbox" id="t5b"><label for="t5b"><code>rhinopaint.es</code> — MX cambiados y SPF puesto</label></li>
+      <li><input type="checkbox" id="t5c"><label for="t5c"><code>micromagic.es</code> — MX cambiados y SPF puesto</label></li>
+      <li><input type="checkbox" id="t5d"><label for="t5d">DKIM y DMARC añadidos en los tres</label></li>
+      <li><input type="checkbox" id="t5e"><label for="t5e"><em>Verify Records</em> en verde en forwardemail</label></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Fase 6</span>
+      <span class="quien quien--tu">LO HACES TÚ</span>
+    </div>
+    <h2>Comprobar que el correo funciona</h2>
+    <p>Espera 15 minutos tras el cambio y, en la terminal:</p>
+<pre><code>for d in micromagic.tv rhinopaint.es micromagic.es; do
+  echo "== $d"; dig +short MX $d; dig +short TXT $d | grep spf1
+done</code></pre>
+    <p>Después, las pruebas de verdad — manda un correo a cada una:</p>
+    <table class="t">
+      <tr><th>A esta dirección</th><th>Debe acabar en</th></tr>
+      <tr><td><code>administracion@micromagic.tv</code></td><td>su buzón IMAP</td></tr>
+      <tr><td><code>info@rhinopaint.es</code></td><td>su buzón IMAP</td></tr>
+      <tr><td><code>loquesea@micromagic.tv</code></td><td>la Gmail nueva</td></tr>
+      <tr><td><code>loquesea@rhinopaint.es</code></td><td>la Gmail nueva</td></tr>
+      <tr><td><code>loquesea@micromagic.es</code></td><td>la Gmail nueva</td></tr>
+    </table>
+    <p>Las direcciones inventadas son la prueba clave: confirman que el catch-all
+       recoge también los dos buzones que no hemos identificado.</p>
+
+    <div class="ficha">
+      <p class="ficha__titulo">Para configurarlo en Mail.app o el móvil</p>
+      <div class="campo">
+        <span class="campo__et">IMAP</span>
+        <span class="campo__val" id="v-imap">imap.forwardemail.net</span>
+        <button class="copiar" data-c="v-imap">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">Puerto IMAP</span><span class="campo__val">993 · SSL/TLS</span><span></span>
+      </div>
+      <div class="campo">
+        <span class="campo__et">SMTP</span>
+        <span class="campo__val" id="v-smtp">smtp.forwardemail.net</span>
+        <button class="copiar" data-c="v-smtp">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">Puerto SMTP</span><span class="campo__val">465 · SSL/TLS</span><span></span>
+      </div>
+      <div class="campo">
+        <span class="campo__et">Usuario</span><span class="campo__val">la dirección completa + contraseña del alias</span><span></span>
+      </div>
+    </div>
+
+    <ul class="tareas">
+      <li><input type="checkbox" id="t6a"><label for="t6a">Los MX responden a forwardemail</label></li>
+      <li><input type="checkbox" id="t6b"><label for="t6b">Llegan los correos a los 2 buzones reales</label></li>
+      <li><input type="checkbox" id="t6c"><label for="t6c">Llegan a la Gmail los de direcciones inventadas, en los 3 dominios</label></li>
+      <li><input type="checkbox" id="t6d"><label for="t6d">Se puede enviar desde los 2 buzones reales</label></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Fase 7</span>
+      <span class="quien quien--yo">LO HAGO YO</span>
+    </div>
+    <h2>Meter el histórico en los buzones nuevos</h2>
+    <p>
+      Para que <code>administracion@micromagic.tv</code> e
+      <code>info@rhinopaint.es</code> arranquen con su correo de años dentro, no vacíos.
+    </p>
+<pre><code>nano ~/.forwardemail-correo
+# direccion:contraseñaDelAlias   (la del alias, no la de la cuenta)
+chmod 600 ~/.forwardemail-correo
+
+cd ~/cop/micromagic-web
+./scripts/subir-correo.sh --probar   # conecta y lista, sin escribir
+./scripts/subir-correo.sh            # sube de verdad</code></pre>
+    <ul class="tareas">
+      <li><input type="checkbox" id="t7a"><label for="t7a">Histórico subido a los 2 buzones</label></li>
+      <li><input type="checkbox" id="t7b"><label for="t7b">Comprobado en el webmail que los mensajes están</label></li>
+      <li><input type="checkbox" id="t7c"><label for="t7c">Borradas las credenciales: <code>rm -P ~/.forwardemail-correo</code></label></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Fase 8</span>
+      <span class="quien quien--tu">LO HACES TÚ</span>
+    </div>
+    <h2>Pasar la web al dominio</h2>
+    <p>Primero <a href="https://d677xh5eyelbe.cloudfront.net">revisa la web nueva</a>
+       y dime si hay algo que corregir. Cuando le des el visto bueno:</p>
+    <ol>
+      <li>En el DNS de <code>micromagic.tv</code>, baja el <strong>TTL a 300 s</strong> y espera a que caduque el anterior (una hora si estaba en 3600)</li>
+      <li>Cambia el registro <strong>A</strong> de <code>micromagic.tv</code> y el de <code>www</code>, que hoy apuntan a <code>217.160.0.235</code>, por un CNAME a la distribución</li>
+    </ol>
+    <div class="ficha">
+      <div class="campo">
+        <span class="campo__et">Apunta a</span>
+        <span class="campo__val" id="v-cf">d677xh5eyelbe.cloudfront.net</span>
+        <button class="copiar" data-c="v-cf">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">Valor actual</span>
+        <span class="campo__val">217.160.0.235 &nbsp;(el webspace de IONOS)</span><span></span>
+      </div>
+    </div>
+    <div class="aviso">
+      <strong>No borres los dos CNAME largos que empiezan por guion bajo.</strong>
+      Son los que validan el certificado, y ACM los vuelve a leer cada vez que lo
+      renueva. Si desaparecen, dentro de unos meses la web deja de cargar por HTTPS.
+    </div>
+    <p>Comprueba después:</p>
+<pre><code>dig +short micromagic.tv
+curl -sI https://micromagic.tv | head -3</code></pre>
+    <ul class="tareas">
+      <li><input type="checkbox" id="t8a"><label for="t8a">Revisada y aprobada la web nueva</label></li>
+      <li><input type="checkbox" id="t8b"><label for="t8b">TTL bajado a 300 s</label></li>
+      <li><input type="checkbox" id="t8c"><label for="t8c">Registros cambiados a CloudFront</label></li>
+      <li><input type="checkbox" id="t8d"><label for="t8d"><code>https://micromagic.tv</code> carga la web nueva</label></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Fase 9</span>
+      <span class="quien quien--tu">LO HACES TÚ</span>
+    </div>
+    <h2>Cancelar en IONOS</h2>
+    <div class="aviso">
+      <strong>Espera una semana desde la fase 6.</strong>
+      Mientras los buzones viejos sigan vivos, cualquier fallo del reenvío es
+      recuperable. En cuanto se cancelan, deja de serlo.
+    </div>
+
+    <h3>Antes de nada, una llamada</h3>
+    <p>
+      Tienes asesor asignado: <strong>Miguel Ángel Parra, +34 910 759 247</strong>.
+      Pídele que te confirme <strong>por escrito</strong> que al cancelar el
+      paquete de hosting:
+    </p>
+    <ul>
+      <li>Los tres dominios siguen siendo tuyos</li>
+      <li>Puedes seguir editando su DNS</li>
+    </ul>
+    <p>
+      De ese DNS dependen la web nueva, el certificado y todo el correo. Son
+      contratos distintos y deberían sobrevivir, pero <strong>un dominio perdido
+      no se recupera</strong> y esta llamada cuesta cinco minutos.
+    </p>
+
+    <h3>Qué cancelar, en este orden</h3>
+    <table class="t">
+      <tr><th>Línea</th><th class="num">€/mes</th></tr>
+      <tr><td>Correo Profesional 5 Lic. + 1 Lic.</td><td class="num">24,00</td></tr>
+      <tr><td>IONOS Soporte PHP 7.4</td><td class="num">15,62</td></tr>
+      <tr><td>IONOS Nivel de rendimiento 2</td><td class="num">2,50</td></tr>
+      <tr><td>Cuota mensual de hosting</td><td class="num">10,00</td></tr>
+      <tr><th>Base imponible que desaparece</th><th class="num">52,12</th></tr>
+    </table>
+    <p class="nota">
+      Los 15,62 € de «Soporte PHP 7.4» son un suplemento por servir una versión
+      de PHP muerta desde 2022. Llevas casi cuatro años pagándolos.
+    </p>
+
+    <h3>Y lo demás</h3>
+    <ul>
+      <li>Borrar del servidor <code>BacobanEspaa</code>, <code>BacobanPortugal</code> y <code>MICROMAGICESPONJAMAGICA</code>, y sus bases de datos en el panel — están todos en el backup</li>
+      <li>Dejar sin renovar <code>bacoban.es</code>, <code>bacoban.pt</code>, <code>cristaltecno.com</code>, <code>asapcleaning.uk</code>, <code>limpexpress.es</code> e <code>ingenieriaybioproteccionambiental.es</code></li>
+    </ul>
+    <p class="nota">
+      Las bajas suelen aplicar en la renovación, no al instante: no te asustes si
+      el recibo del mes que viene aún viene alto.
+    </p>
+
+    <ul class="tareas">
+      <li><input type="checkbox" id="t9a"><label for="t9a">Confirmado por escrito que los dominios sobreviven</label></li>
+      <li><input type="checkbox" id="t9b"><label for="t9b">Canceladas las licencias de correo</label></li>
+      <li><input type="checkbox" id="t9c"><label for="t9c">Cancelado el soporte de PHP 7.4</label></li>
+      <li><input type="checkbox" id="t9d"><label for="t9d">Cancelado el nivel de rendimiento y la cuota de hosting</label></li>
+      <li><input type="checkbox" id="t9e"><label for="t9e">Borrados los 3 sitios restantes y sus bases de datos</label></li>
+      <li><input type="checkbox" id="t9f"><label for="t9f">Dominios sobrantes marcados para no renovar</label></li>
+    </ul>
+  </section>
+
+  <!-- ══════════════════════════════════════════ -->
+  <section class="fase">
+    <div class="fase__cab">
+      <span class="fase__num">Al terminar</span>
+    </div>
+    <h2>Dónde acabas</h2>
+    <table class="t">
+      <tr><th></th><th class="num">Antes</th><th class="num">Después</th></tr>
+      <tr><td>IONOS</td><td class="num">63,07 €/mes</td><td class="num">0 €</td></tr>
+      <tr><td>Correo</td><td class="num">incluido arriba</td><td class="num">~2,80 €/mes</td></tr>
+      <tr><td>AWS</td><td class="num">—</td><td class="num">~1 €/mes</td></tr>
+      <tr><th>Total</th><th class="num">63,07 €/mes</th><th class="num">~4 €/mes</th></tr>
+    </table>
+    <p>
+      Más la cuota anual de los tres dominios, que se paga se quede donde se
+      quede. <strong>Unos 700 € al año de ahorro.</strong>
+    </p>
+
+    <h3>Pendiente, aparte de todo esto</h3>
+    <p>
+      <code>limpexpress.es</code> — un dominio de tu factura — reenvía su correo
+      a <code>julianhall2fwp@outlook.com</code>, una dirección que no tiene nada
+      que ver contigo. Alguien cambió ese DNS. Míralo antes de soltar el dominio.
+    </p>
+  </section>
+
+  <footer>
+    Guía hermana ya completada: <code>dns-ionos.html</code> ·
+    Detalle del correo: <code>correo-a-gmail.html</code><br>
+    Scripts: <code>rescatar-correo.sh</code>, <code>subir-correo.sh</code>,
+    <code>desplegar.sh</code>
+  </footer>
+</div>
+
+<script>
+  // --- avance, guardado en el navegador ---------------------------------
+  var casillas = Array.prototype.slice.call(document.querySelectorAll('ul.tareas input'));
+  var contador = document.getElementById('contador');
+  var relleno = document.getElementById('relleno');
+
+  function pintar() {
+    var n = casillas.filter(function (c) { return c.checked; }).length;
+    contador.textContent = n + ' de ' + casillas.length;
+    relleno.style.width = casillas.length ? (n / casillas.length * 100) + '%' : '0';
+  }
+
+  casillas.forEach(function (c) {
+    try { c.checked = localStorage.getItem('ionos-' + c.id) === '1'; } catch (e) {}
+    c.addEventListener('change', function () {
+      try { localStorage.setItem('ionos-' + c.id, c.checked ? '1' : '0'); } catch (e) {}
+      pintar();
+    });
+  });
+  pintar();
+
+  document.getElementById('reiniciar').addEventListener('click', function () {
+    if (!confirm('¿Desmarcar todas las casillas?')) return;
+    casillas.forEach(function (c) {
+      c.checked = false;
+      try { localStorage.removeItem('ionos-' + c.id); } catch (e) {}
+    });
+    pintar();
+  });
+
+  // --- copiar -----------------------------------------------------------
+  document.querySelectorAll('.copiar').forEach(function (b) {
+    var campo = document.getElementById(b.dataset.c);
+    b.addEventListener('click', function () {
+      var texto = campo.textContent.trim();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(texto).then(
+          function () { avisar(b, true); },
+          function () { respaldo(b, campo, texto); }
+        );
+      } else { respaldo(b, campo, texto); }
+    });
+  });
+
+  // Abierta como file://, la API del portapapeles puede estar bloqueada:
+  // más vale seleccionar el texto y decirlo que fingir que se ha copiado.
+  function respaldo(b, campo, texto) {
+    var a = document.createElement('textarea');
+    a.value = texto;
+    a.style.cssText = 'position:fixed;top:-100px;opacity:0';
+    document.body.appendChild(a);
+    a.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(a);
+    if (ok) { avisar(b, true); return; }
+    var sel = window.getSelection(), r = document.createRange();
+    r.selectNodeContents(campo); sel.removeAllRanges(); sel.addRange(r);
+    avisar(b, false);
+  }
+
+  function avisar(b, ok) {
+    if (b.dataset.original === undefined) b.dataset.original = b.textContent;
+    b.textContent = ok ? 'Copiado' : 'Pulsa ⌘C';
+    b.classList.toggle('ok', ok);
+    b.classList.toggle('manual', !ok);
+    clearTimeout(b._t);
+    b._t = setTimeout(function () {
+      b.textContent = b.dataset.original;
+      b.classList.remove('ok', 'manual');
+    }, ok ? 1600 : 4000);
+  }
+</script>
+</body>
+</html>
