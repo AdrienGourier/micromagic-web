@@ -1,6 +1,6 @@
 #!/bin/bash
 # Sube a forwardemail el histórico que rescatar-correo.sh bajó de IONOS, para
-# que los dos buzones reales no arranquen vacíos.
+# que los tres buzones reales no arranquen vacíos.
 #
 # mbsync sincroniza en ambos sentidos: el mismo Maildir que se descargó con
 # `Sync Pull` se sube aquí con `Sync Push`.
@@ -10,6 +10,7 @@
 # forwardemail, sino la que genera su panel para cada alias.
 #
 #   administracion@micromagic.tv:contraseñaDelAlias
+#   director@micromagic.tv:contraseñaDelAlias
 #   info@rhinopaint.es:contraseñaDelAlias
 #
 # Uso:

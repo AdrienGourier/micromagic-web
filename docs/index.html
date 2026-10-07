@@ -167,7 +167,7 @@
       <tr><th>Dirección</th><th>Estado a 7 de octubre</th></tr>
       <tr><td><code>administracion@micromagic.tv</code></td><td>contraseña ✓ · desde 2020 · <strong>tendrá buzón real</strong></td></tr>
       <tr><td><code>info@rhinopaint.es</code></td><td>contraseña ✓ · desde 2021 · <strong>tendrá buzón real</strong></td></tr>
-      <tr><td><code>director@micromagic.tv</code></td><td>contraseña ✓ · desde 2025 · último envío en agosto</td></tr>
+      <tr><td><code>director@micromagic.tv</code></td><td>contraseña ✓ · desde 2025 · <strong>tendrá buzón real</strong></td></tr>
       <tr><td><code>info@micromagic.tv</code></td><td>contraseña ✓ · casi sin uso desde abril</td></tr>
       <tr><td><code>info@bacoban.es</code></td><td>salía en WordPress, <strong>falta confirmar en el panel si es buzón</strong></td></tr>
       <tr><td>?</td><td><strong>la sexta licencia: falta saber cuál es</strong></td></tr>
@@ -224,7 +224,7 @@ chmod 600 ~/.ionos-correo</code></pre>
           sin darle acceso a nada tuyo.</li>
       <li><strong>Una cuenta en <a href="https://forwardemail.net">forwardemail.net</a></strong>
           con el plan <strong>Enhanced Protection</strong>, 3 $/mes. El plan
-          gratuito solo reenvía: no guarda nada, y necesitamos dos buzones reales.</li>
+          gratuito solo reenvía: no guarda nada, y necesitamos tres buzones reales.</li>
     </ol>
     <p class="nota">Yo no puedo crear cuentas ni pagar suscripciones.</p>
     <ul class="tareas">
@@ -244,6 +244,7 @@ chmod 600 ~/.ionos-correo</code></pre>
     <table class="t">
       <tr><th>Dominio</th><th>Alias</th><th>Qué hace</th></tr>
       <tr><td><code>micromagic.tv</code></td><td><code>administracion</code></td><td><strong>Buzón real.</strong> Genera y guarda su contraseña</td></tr>
+      <tr><td><code>micromagic.tv</code></td><td><code>director</code></td><td><strong>Buzón real.</strong> Genera y guarda su contraseña</td></tr>
       <tr><td><code>micromagic.tv</code></td><td><code>*</code></td><td>Reenvía a la Gmail nueva</td></tr>
       <tr><td><code>rhinopaint.es</code></td><td><code>info</code></td><td><strong>Buzón real.</strong> Genera y guarda su contraseña</td></tr>
       <tr><td><code>rhinopaint.es</code></td><td><code>*</code></td><td>Reenvía a la Gmail nueva</td></tr>
@@ -251,12 +252,12 @@ chmod 600 ~/.ionos-correo</code></pre>
     </table>
     <p>
       El alias <code>*</code> es el <strong>catch-all</strong>: recoge cualquier
-      dirección del dominio. Es justamente lo que salva las dos direcciones que
-      no sabemos cuáles son.
+      dirección del dominio. Es justamente lo que salva las direcciones que
+      todavía no conocemos.
     </p>
     <p class="nota">
       Un alias puede guardar <em>y</em> reenviar a la vez: si quieres ver también
-      en Gmail lo que entra en los dos buzones reales, añade la Gmail como
+      en Gmail lo que entra en los tres buzones reales, añade la Gmail como
       destino además del almacenamiento.
     </p>
     <div class="aviso">
@@ -266,7 +267,7 @@ chmod 600 ~/.ionos-correo</code></pre>
     </div>
     <ul class="tareas">
       <li><input type="checkbox" id="t4a"><label for="t4a">Los 3 dominios añadidos</label></li>
-      <li><input type="checkbox" id="t4b"><label for="t4b">Los 2 buzones reales creados y sus contraseñas guardadas</label></li>
+      <li><input type="checkbox" id="t4b"><label for="t4b">Los 3 buzones reales creados y sus contraseñas guardadas</label></li>
       <li><input type="checkbox" id="t4c"><label for="t4c">Los 3 catch-all apuntando a la Gmail</label></li>
     </ul>
   </section>
@@ -354,13 +355,14 @@ done</code></pre>
     <table class="t">
       <tr><th>A esta dirección</th><th>Debe acabar en</th></tr>
       <tr><td><code>administracion@micromagic.tv</code></td><td>su buzón IMAP</td></tr>
+      <tr><td><code>director@micromagic.tv</code></td><td>su buzón IMAP</td></tr>
       <tr><td><code>info@rhinopaint.es</code></td><td>su buzón IMAP</td></tr>
       <tr><td><code>loquesea@micromagic.tv</code></td><td>la Gmail nueva</td></tr>
       <tr><td><code>loquesea@rhinopaint.es</code></td><td>la Gmail nueva</td></tr>
       <tr><td><code>loquesea@micromagic.es</code></td><td>la Gmail nueva</td></tr>
     </table>
     <p>Las direcciones inventadas son la prueba clave: confirman que el catch-all
-       recoge también los dos buzones que no hemos identificado.</p>
+       recoge también los buzones que no hemos identificado.</p>
 
     <div class="ficha">
       <p class="ficha__titulo">Para configurarlo en Mail.app o el móvil</p>
@@ -387,9 +389,9 @@ done</code></pre>
 
     <ul class="tareas">
       <li><input type="checkbox" id="t6a"><label for="t6a">Los MX responden a forwardemail</label></li>
-      <li><input type="checkbox" id="t6b"><label for="t6b">Llegan los correos a los 2 buzones reales</label></li>
+      <li><input type="checkbox" id="t6b"><label for="t6b">Llegan los correos a los 3 buzones reales</label></li>
       <li><input type="checkbox" id="t6c"><label for="t6c">Llegan a la Gmail los de direcciones inventadas, en los 3 dominios</label></li>
-      <li><input type="checkbox" id="t6d"><label for="t6d">Se puede enviar desde los 2 buzones reales</label></li>
+      <li><input type="checkbox" id="t6d"><label for="t6d">Se puede enviar desde los 3 buzones reales</label></li>
     </ul>
   </section>
 
@@ -401,8 +403,8 @@ done</code></pre>
     </div>
     <h2>Meter el histórico en los buzones nuevos</h2>
     <p>
-      Para que <code>administracion@micromagic.tv</code> e
-      <code>info@rhinopaint.es</code> arranquen con su correo de años dentro, no vacíos.
+      Para que <code>administracion@micromagic.tv</code>,
+      <code>director@micromagic.tv</code> e <code>info@rhinopaint.es</code> arranquen con su correo de años dentro, no vacíos.
     </p>
 <pre><code>nano ~/.forwardemail-correo
 # direccion:contraseñaDelAlias   (la del alias, no la de la cuenta)
@@ -412,7 +414,7 @@ cd ~/cop/micromagic-web
 ./scripts/subir-correo.sh --probar   # conecta y lista, sin escribir
 ./scripts/subir-correo.sh            # sube de verdad</code></pre>
     <ul class="tareas">
-      <li><input type="checkbox" id="t7a"><label for="t7a">Histórico subido a los 2 buzones</label></li>
+      <li><input type="checkbox" id="t7a"><label for="t7a">Histórico subido a los 3 buzones</label></li>
       <li><input type="checkbox" id="t7b"><label for="t7b">Comprobado en el webmail que los mensajes están</label></li>
       <li><input type="checkbox" id="t7c"><label for="t7c">Borradas las credenciales: <code>rm -P ~/.forwardemail-correo</code></label></li>
     </ul>

@@ -99,14 +99,14 @@
   <h1>Mover el correo<br>a forwardemail</h1>
   <p class="entradilla">
     Un solo proveedor para los tres dominios: buzón real con IMAP para
-    <code>administracion@micromagic.tv</code> e <code>info@rhinopaint.es</code>,
-    y todo lo demás reenviado a una Gmail. Los seis buzones de IONOS —24 € al
+    <code>administracion@micromagic.tv</code>, <code>director@micromagic.tv</code>
+    e <code>info@rhinopaint.es</code>, y todo lo demás reenviado a una Gmail. Los seis buzones de IONOS —24 € al
     mes— se pueden cancelar después.
   </p>
 
   <div class="aviso aviso--ok">
     <strong>34 € al año en vez de 288 €.</strong>
-    Y los dos buzones reales arrancan con su histórico dentro, no vacíos.
+    Y los tres buzones reales arrancan con su histórico dentro, no vacíos.
   </div>
 
   <div class="aviso">
@@ -151,6 +151,8 @@
       <tbody>
         <tr><td><code>micromagic.tv</code></td><td><code>administracion</code></td>
             <td><strong>Buzón real.</strong> Genera su contraseña y guárdala.</td></tr>
+        <tr><td><code>micromagic.tv</code></td><td><code>director</code></td>
+            <td><strong>Buzón real.</strong> Genera su contraseña y guárdala.</td></tr>
         <tr><td><code>micromagic.tv</code></td><td><code>*</code></td>
             <td>Reenvía a <span class="destino">la Gmail nueva</span></td></tr>
         <tr><td><code>rhinopaint.es</code></td><td><code>info</code></td>
@@ -164,16 +166,16 @@
 
     <p>
       El alias <code>*</code> es el <strong>catch-all</strong>: recoge cualquier
-      dirección del dominio, incluidas las dos que no sabemos cuáles son. Es lo
+      dirección del dominio, incluidas las que no conocemos. Es lo
       que garantiza que no se pierda nada.
     </p>
     <p class="nota">
       Un alias puede guardar <em>y</em> reenviar a la vez. Si quieres ver también
-      en Gmail lo que entra en los dos buzones reales, añade la Gmail como
+      en Gmail lo que entra en los tres buzones reales, añade la Gmail como
       destino de reenvío además del almacenamiento.
     </p>
     <p>
-      Las contraseñas de los dos buzones reales son <strong>por alias</strong>,
+      Las contraseñas de los tres buzones reales son <strong>por alias</strong>,
       distintas de la de tu cuenta. Apúntalas: hacen falta para el paso 6.
     </p>
   </section>
@@ -287,10 +289,11 @@ done</code></pre>
     <p>Después, las pruebas que de verdad importan:</p>
     <ul>
       <li>Correo a <code>administracion@micromagic.tv</code> → debe quedarse en su buzón.</li>
+      <li>Correo a <code>director@micromagic.tv</code> → igual.</li>
       <li>Correo a <code>info@rhinopaint.es</code> → igual.</li>
       <li>Correo a una dirección <strong>inventada</strong> de cada dominio
           (<code>loquesea@micromagic.es</code>) → debe llegar a la Gmail.</li>
-      <li>Responder desde los dos buzones reales y comprobar que sale con su
+      <li>Responder desde los tres buzones reales y comprobar que sale con su
           propia dirección.</li>
     </ul>
     <p>Datos para configurarlos en Mail.app o en el móvil:</p>
@@ -325,7 +328,7 @@ done</code></pre>
 ./scripts/subir-correo.sh --probar   # conecta y lista, sin tocar nada
 ./scripts/subir-correo.sh            # sube de verdad</code></pre>
     <p>
-      Los dos buzones quedan con todo su correo de los últimos años dentro.
+      Los tres buzones quedan con todo su correo de los últimos años dentro.
       Compruébalo en el webmail antes de cancelar nada.
     </p>
     <p class="nota">Cuando termines: <code>rm -P ~/.forwardemail-correo</code></p>
