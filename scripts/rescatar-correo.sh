@@ -17,12 +17,15 @@
 #
 # Uso:
 #   ./scripts/rescatar-correo.sh            descarga todo
-#   ./scripts/rescatar-correo.sh --listar   solo cuenta mensajes, no descarga
+#   ./scripts/rescatar-correo.sh --listar   solo lista carpetas, no descarga
+#   DESTINO=~/Backups/ionos-correo-AAAA-MM-DD ./scripts/rescatar-correo.sh
+#                                           completa un rescate anterior
 
 set -uo pipefail
 
 CREDS="$HOME/.ionos-correo"
-DESTINO="$HOME/Backups/ionos-correo-$(date +%Y-%m-%d)"
+# Pasando DESTINO de un rescate anterior, mbsync solo baja lo nuevo.
+DESTINO="${DESTINO:-$HOME/Backups/ionos-correo-$(date +%Y-%m-%d)}"
 CONF="$(mktemp -t mbsyncrc)"
 SERVIDOR="imap.ionos.es"
 
