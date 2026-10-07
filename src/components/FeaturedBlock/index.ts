@@ -1,1 +1,0 @@
-export { FeaturedBlock } from './FeaturedBlock'

@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Validar el certificado en IONOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --papel:#e4e5e0; --caja:#eff0ec; --linea:#a7aca5; --suave:#6d736c;
+    --tinta:#000; --alerta:#c4341f; --bien:#1d7a3e; --agua:#1e6fa8;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme=light]){
+      --papel:#14161a; --caja:#1c1f24; --linea:#3a3f45; --suave:#9aa199;
+      --tinta:#f2f3ef; --alerta:#ef6b53; --bien:#5fbd7f; --agua:#6cb2e4;
+    }
+  }
+  :root[data-theme=dark]{
+    --papel:#14161a; --caja:#1c1f24; --linea:#3a3f45; --suave:#9aa199;
+    --tinta:#f2f3ef; --alerta:#ef6b53; --bien:#5fbd7f; --agua:#6cb2e4;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--papel); color:var(--tinta);
+    font-family:Archivo,system-ui,-apple-system,sans-serif;
+    font-size:17px; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .envoltorio{width:min(100% - 2rem,50rem); margin-inline:auto; padding:2.5rem 0 5rem}
+  h1{font-variation-settings:'wdth' 115,'wght' 800; font-size:clamp(2rem,6vw,3rem);
+     line-height:1.05; letter-spacing:-.015em; margin:0 0 .3em}
+  .entradilla{color:var(--suave); max-width:46ch; margin:0 0 1.5rem}
+  h2{font-variation-settings:'wdth' 108,'wght' 700; font-size:1.35rem; margin:0}
+
+  .plazo{border:2px solid var(--alerta); padding:.9rem 1.1rem; margin-bottom:2.5rem}
+  .plazo strong{color:var(--alerta)}
+
+  .paso{border-top:3px solid var(--tinta); padding-top:1rem; margin-top:2.5rem}
+  .paso__num{font-variation-settings:'wdth' 100,'wght' 700; color:var(--suave);
+             font-size:.85rem; display:block; margin-bottom:.2rem}
+  .paso p{max-width:60ch}
+  .paso ol,.paso ul{max-width:60ch; padding-left:1.2rem}
+  .paso li{margin-bottom:.5rem}
+
+  .ficha{background:var(--caja); border:1px solid var(--linea); padding:1.1rem; margin:1.2rem 0}
+  .ficha__titulo{font-variation-settings:'wdth' 108,'wght' 700; margin:0 0 .8rem; font-size:1.05rem}
+  .campo{display:grid; grid-template-columns:7.5rem 1fr auto; gap:.6rem;
+         align-items:center; padding:.55rem 0; border-top:1px solid var(--linea)}
+  .campo:first-of-type{border-top:0}
+  .campo__et{color:var(--suave); font-size:.85rem}
+  .campo__val{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9rem;
+              word-break:break-all; line-height:1.4}
+  .copiar{font:inherit; font-size:.8rem; font-variation-settings:'wdth' 100,'wght' 700;
+          background:var(--tinta); color:var(--papel); border:2px solid var(--tinta);
+          padding:.35rem .7rem; cursor:pointer; white-space:nowrap}
+  .copiar:hover{background:transparent; color:var(--tinta)}
+  .copiar.hecho{background:var(--bien); border-color:var(--bien); color:#fff}
+  .copiar.manual{background:var(--agua); border-color:var(--agua); color:#fff}
+  .campo__val::selection{background:var(--agua); color:#fff}
+  @media (max-width:34rem){
+    .campo{grid-template-columns:1fr; gap:.25rem}
+    .copiar{justify-self:start; margin-top:.3rem}
+  }
+
+  .evitar{border:2px solid var(--alerta); padding:1.1rem; margin:1.2rem 0}
+  .evitar h3{margin:0 0 .6rem; font-size:1.05rem; color:var(--alerta);
+             font-variation-settings:'wdth' 105,'wght' 700}
+  .mal,.bien{font-family:ui-monospace,Menlo,monospace; font-size:.85rem;
+             padding:.45rem .6rem; margin:.35rem 0; word-break:break-all}
+  .mal{background:color-mix(in srgb,var(--alerta) 14%,transparent);
+       border-left:4px solid var(--alerta)}
+  .bien{background:color-mix(in srgb,var(--bien) 14%,transparent);
+        border-left:4px solid var(--bien)}
+  .etiq{font-variation-settings:'wdth' 100,'wght' 700; display:block; font-size:.75rem;
+        margin-bottom:.15rem; letter-spacing:.02em}
+  .mal .etiq{color:var(--alerta)} .bien .etiq{color:var(--bien)}
+
+  pre{background:var(--caja); border:1px solid var(--linea); padding:.9rem;
+      overflow-x:auto; font-size:.85rem; margin:.8rem 0}
+  code{font-family:ui-monospace,Menlo,monospace}
+  a{color:var(--agua)}
+  .nota{color:var(--suave); font-size:.9rem}
+  footer{margin-top:3.5rem; border-top:1px solid var(--linea); padding-top:1rem;
+         color:var(--suave); font-size:.85rem}
+  :focus-visible{outline:3px solid var(--agua); outline-offset:3px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="envoltorio">
+
+  <h1>Validar el certificado<br>en IONOS</h1>
+  <p class="entradilla">
+    Dos registros que hay que crear una sola vez. Sirven para que AWS compruebe
+    que el dominio <strong>micromagic.tv</strong> es tuyo y te dé el certificado
+    HTTPS, que es gratis. No tocan la web actual: <strong>mientras haces esto,
+    micromagic.tv sigue funcionando exactamente igual.</strong>
+  </p>
+
+  <div class="plazo">
+    <strong>Hay que hacerlo antes del lunes 22 de septiembre.</strong>
+    La solicitud caduca a las 72 horas. Si se pasa, no se rompe nada: se vuelve
+    a pedir y salen códigos nuevos.
+  </div>
+
+  <section class="paso">
+    <span class="paso__num">Paso 1</span>
+    <h2>Entrar en la zona DNS</h2>
+    <ol>
+      <li>Abre <a href="https://my.ionos.es">my.ionos.es</a> e inicia sesión.</li>
+      <li>Ve a <strong>Dominios y SSL</strong>.</li>
+      <li>Busca <strong>micromagic.tv</strong> en la lista.</li>
+      <li>Pulsa la rueda dentada <strong>⚙</strong> a su derecha y elige <strong>DNS</strong>.</li>
+    </ol>
+    <p class="nota">
+      Verás una tabla con registros que ya existen (A, MX, TXT…).
+      <strong>No toques ninguno.</strong> Solo vamos a añadir dos nuevos.
+    </p>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 2</span>
+    <h2>Añadir el primer registro</h2>
+    <p>Pulsa <strong>Añadir registro</strong> y elige el tipo <strong>CNAME</strong>. Rellena así:</p>
+
+    <div class="ficha">
+      <p class="ficha__titulo">Registro 1 — para micromagic.tv</p>
+      <div class="campo">
+        <span class="campo__et">Tipo</span>
+        <span class="campo__val">CNAME</span>
+        <span></span>
+      </div>
+      <div class="campo">
+        <span class="campo__et">Nombre de host</span>
+        <span class="campo__val" id="h1">_088b9cab804a687c337c94f22cddb785</span>
+        <button class="copiar" data-copia="h1">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">Apunta a</span>
+        <span class="campo__val" id="v1">_4b14b3dd407ca033a261b936a16a746d.wzccmgtwzk.acm-validations.aws</span>
+        <button class="copiar" data-copia="v1">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">TTL</span>
+        <span class="campo__val">1 hora (o lo que venga por defecto)</span>
+        <span></span>
+      </div>
+    </div>
+    <p>Guarda.</p>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 3</span>
+    <h2>Añadir el segundo registro</h2>
+    <p>Exactamente igual que el anterior, pero con estos valores:</p>
+
+    <div class="ficha">
+      <p class="ficha__titulo">Registro 2 — para www.micromagic.tv</p>
+      <div class="campo">
+        <span class="campo__et">Tipo</span>
+        <span class="campo__val">CNAME</span>
+        <span></span>
+      </div>
+      <div class="campo">
+        <span class="campo__et">Nombre de host</span>
+        <span class="campo__val" id="h2">_30e9295e99eadb14cc5cece9df4a664c.www</span>
+        <button class="copiar" data-copia="h2">Copiar</button>
+      </div>
+      <div class="campo">
+        <span class="campo__et">Apunta a</span>
+        <span class="campo__val" id="v2">_7ffb04179d0a90ef95d1f3c85ab2337b.wzccmgtwzk.acm-validations.aws</span>
+        <button class="copiar" data-copia="v2">Copiar</button>
+      </div>
+    </div>
+    <p class="nota">
+      Sí, este acaba en <code>.www</code> y el otro no. No es una errata:
+      es el registro que valida el subdominio.
+    </p>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Lo que hay que evitar</span>
+    <h2>Los tres fallos habituales</h2>
+
+    <div class="evitar">
+      <h3>1. Escribir el dominio dentro del host</h3>
+      <p>Es el error más común, y con IONOS pasa mucho. El panel ya añade
+         <code>.micromagic.tv</code> por su cuenta.</p>
+      <div class="mal"><span class="etiq">MAL</span>_088b9cab804a687c337c94f22cddb785.micromagic.tv</div>
+      <div class="bien"><span class="etiq">BIEN</span>_088b9cab804a687c337c94f22cddb785</div>
+      <p class="nota">Si lo pones mal, se crea
+         <code>…micromagic.tv.micromagic.tv</code> y la validación no termina nunca.</p>
+    </div>
+
+    <div class="evitar">
+      <h3>2. Dejarse el guion bajo del principio</h3>
+      <p>Los dos valores empiezan por <code>_</code>. Es parte del nombre, no un adorno.
+         Por eso están los botones de copiar: úsalos y no tendrás que escribir nada.</p>
+    </div>
+
+    <div class="evitar">
+      <h3>3. Elegir el tipo equivocado</h3>
+      <p>Tiene que ser <strong>CNAME</strong>. No TXT, no A, no ALIAS. Si el
+         formulario te pide una IP, has elegido el tipo que no era.</p>
+    </div>
+
+    <p><strong>Y sobre todo: no borres ni edites nada de lo que ya hay.</strong>
+       Los registros existentes son los que mantienen la web y el correo
+       funcionando. Solo añadimos dos.</p>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 4</span>
+    <h2>Comprobar que han quedado bien</h2>
+    <p>Espera cinco minutos y pega esto en la terminal:</p>
+<pre><code>dig +short CNAME _088b9cab804a687c337c94f22cddb785.micromagic.tv
+dig +short CNAME _30e9295e99eadb14cc5cece9df4a664c.www.micromagic.tv</code></pre>
+    <p>Cada línea debe responder con el valor largo que acaba en
+       <code>.acm-validations.aws.</code></p>
+    <ul>
+      <li><strong>Si responde</strong> — perfecto, avísame y sigo yo.</li>
+      <li><strong>Si sale vacío</strong> — o aún no ha propagado (espera un poco más),
+          o el host está mal escrito. Revisa el fallo número 1.</li>
+    </ul>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Después</span>
+    <h2>Qué pasa cuando estén puestos</h2>
+    <p>
+      AWS los detecta solo, en algún momento entre 5 y 30 minutos, y emite el
+      certificado. A partir de ahí me encargo yo: creo la infraestructura y
+      publico la web nueva en una dirección de prueba.
+    </p>
+    <p>
+      <strong>El dominio no cambia todavía.</strong> Primero verás la web nueva
+      en una URL temporal de AWS. Solo cuando le des el visto bueno cambiaremos
+      micromagic.tv, y aun así dejaremos el WordPress de IONOS encendido una
+      semana por si hay que volver atrás.
+    </p>
+  </section>
+
+  <footer>
+    Certificado solicitado el 19 de septiembre de 2026 · cuenta AWS 088668667991<br>
+    <code>arn:aws:acm:us-east-1:088668667991:certificate/ca861c3a-a17c-4a9c-a77b-28fc262c148f</code>
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('.copiar').forEach(function (b) {
+    var campo = document.getElementById(b.dataset.copia);
+    b.addEventListener('click', function () {
+      var texto = campo.textContent.trim();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(texto).then(
+          function () { avisar(b, true); },
+          function () { respaldo(b, campo, texto); }
+        );
+      } else {
+        respaldo(b, campo, texto);
+      }
+    });
+  });
+
+  // Abierta como file://, la API del portapapeles puede estar bloqueada.
+  function respaldo(b, campo, texto) {
+    var a = document.createElement('textarea');
+    a.value = texto;
+    a.style.cssText = 'position:fixed;top:-100px;opacity:0';
+    document.body.appendChild(a);
+    a.select();
+    var copiado = false;
+    try { copiado = document.execCommand('copy'); } catch (e) { copiado = false; }
+    document.body.removeChild(a);
+    if (copiado) { avisar(b, true); return; }
+    // Nada ha funcionado: seleccionar el valor para que se copie a mano.
+    // Callar aquí sería peor que fallar: creería que lo tiene copiado.
+    var sel = window.getSelection();
+    var rango = document.createRange();
+    rango.selectNodeContents(campo);
+    sel.removeAllRanges();
+    sel.addRange(rango);
+    avisar(b, false);
+  }
+
+  function avisar(b, ok) {
+    if (b.dataset.original === undefined) b.dataset.original = b.textContent;
+    b.textContent = ok ? 'Copiado' : 'Pulsa ⌘C';
+    b.classList.toggle('hecho', ok);
+    b.classList.toggle('manual', !ok);
+    clearTimeout(b._t);
+    b._t = setTimeout(function () {
+      b.textContent = b.dataset.original;
+      b.classList.remove('hecho', 'manual');
+    }, ok ? 1600 : 4000);
+  }
+</script>
+</body>
+</html>
