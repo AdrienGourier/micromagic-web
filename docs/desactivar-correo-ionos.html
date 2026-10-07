@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Desactivar el correo de IONOS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --papel:#e4e5e0; --caja:#eff0ec; --linea:#a7aca5; --suave:#6d736c;
+    --tinta:#000; --alerta:#c4341f; --bien:#1d7a3e; --agua:#1e6fa8;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme=light]){
+      --papel:#14161a; --caja:#1c1f24; --linea:#3a3f45; --suave:#9aa199;
+      --tinta:#f2f3ef; --alerta:#ef6b53; --bien:#5fbd7f; --agua:#6cb2e4;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--papel); color:var(--tinta);
+       font-family:Archivo,system-ui,-apple-system,sans-serif; font-size:17px;
+       line-height:1.6; -webkit-font-smoothing:antialiased}
+  .envoltorio{width:min(100% - 2rem,52rem); margin-inline:auto; padding:2.5rem 0 5rem}
+  h1{font-variation-settings:'wdth' 115,'wght' 800; font-size:clamp(2rem,6vw,3rem);
+     line-height:1.05; letter-spacing:-.015em; margin:0 0 .3em}
+  .entradilla{color:var(--suave); max-width:50ch; margin:0 0 1.5rem}
+  h2{font-variation-settings:'wdth' 108,'wght' 700; font-size:1.35rem; margin:0}
+
+  .aviso{border:2px solid var(--alerta); padding:.9rem 1.1rem; margin-bottom:1.2rem}
+  .aviso strong{color:var(--alerta)}
+  .aviso ol{margin:.6rem 0 0; padding-left:1.2rem} .aviso li{margin-bottom:.4rem}
+  .aviso--ok{border-color:var(--bien)} .aviso--ok strong{color:var(--bien)}
+
+  .paso{border-top:3px solid var(--tinta); padding-top:1rem; margin-top:2.5rem}
+  .paso__num{font-variation-settings:'wdth' 100,'wght' 700; color:var(--suave);
+             font-size:.85rem; display:block; margin-bottom:.2rem}
+  .paso p,.paso ol,.paso ul{max-width:62ch}
+  .paso ol,.paso ul{padding-left:1.2rem} .paso li{margin-bottom:.5rem}
+
+  table.t{border-collapse:collapse; width:100%; margin:1.2rem 0; font-size:.92rem}
+  table.t th,table.t td{border:1px solid var(--linea); padding:.55rem .7rem; text-align:left; vertical-align:top}
+  table.t th{background:var(--caja); font-variation-settings:'wdth' 100,'wght' 700}
+  table.t code{font-size:.85rem; word-break:break-all}
+
+  .ficha{background:var(--caja); border:1px solid var(--linea); padding:1.1rem; margin:1.2rem 0}
+  .ficha__titulo{font-variation-settings:'wdth' 108,'wght' 700; margin:0 0 .8rem; font-size:1.05rem}
+  .campo{display:grid; grid-template-columns:8rem 1fr auto; gap:.6rem; align-items:center;
+         padding:.55rem 0; border-top:1px solid var(--linea)}
+  .campo:first-of-type{border-top:0}
+  .campo__et{color:var(--suave); font-size:.85rem}
+  .campo__val{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.9rem;
+              word-break:break-all; line-height:1.4}
+  .copiar{font:inherit; font-size:.8rem; font-variation-settings:'wdth' 100,'wght' 700;
+          background:var(--tinta); color:var(--papel); border:2px solid var(--tinta);
+          padding:.35rem .7rem; cursor:pointer; white-space:nowrap}
+  .copiar:hover{background:transparent; color:var(--tinta)}
+  .copiar.hecho{background:var(--bien); border-color:var(--bien); color:#fff}
+  .copiar.manual{background:var(--agua); border-color:var(--agua); color:#fff}
+  .campo__val::selection{background:var(--agua); color:#fff}
+  @media (max-width:34rem){
+    .campo{grid-template-columns:1fr; gap:.25rem}
+    .copiar{justify-self:start; margin-top:.3rem}
+  }
+
+  .evitar{border:2px solid var(--alerta); padding:1.1rem; margin:1.2rem 0}
+  .evitar h3{margin:0 0 .6rem; font-size:1.05rem; color:var(--alerta);
+             font-variation-settings:'wdth' 105,'wght' 700}
+  .evitar p{margin:0}
+
+  .marcha{background:var(--caja); border:2px dashed var(--linea); padding:1rem; margin:1.2rem 0}
+
+  .dominio{border:2px solid var(--tinta); padding:1rem 1.1rem; margin:1rem 0}
+  .dominio h3{margin:0 0 .3rem; font-family:ui-monospace,Menlo,monospace; font-size:1.05rem}
+  .dominio p{margin:.2rem 0 .7rem; color:var(--suave); font-size:.92rem}
+  ul.tareas{list-style:none; padding:0; margin:0}
+  ul.tareas li{border-top:1px solid var(--linea); padding:.5rem 0; display:flex; gap:.7rem; align-items:center}
+  ul.tareas input{width:1.15rem; height:1.15rem; accent-color:var(--bien); flex:none}
+
+  pre{background:var(--caja); border:1px solid var(--linea); padding:.9rem;
+      overflow-x:auto; font-size:.85rem; margin:.8rem 0}
+  code{font-family:ui-monospace,Menlo,monospace}
+  a{color:var(--agua)}
+  .nota{color:var(--suave); font-size:.9rem}
+  footer{margin-top:3.5rem; border-top:1px solid var(--linea); padding-top:1rem;
+         color:var(--suave); font-size:.85rem}
+  :focus-visible{outline:3px solid var(--agua); outline-offset:3px}
+</style>
+</head>
+<body>
+<div class="envoltorio">
+
+  <h1>Desactivar el correo<br>de IONOS</h1>
+  <p class="entradilla">
+    IONOS no deja borrar sus MX mientras su servicio de correo está activo en
+    el dominio. Se desactiva y, en el mismo minuto, se ponen los MX de
+    forwardemail. Un dominio cada vez, unos diez minutos cada uno.
+  </p>
+
+  <div class="aviso">
+    <strong>No pulses nada hasta que te dé luz verde.</strong>
+    En cuanto desactivas el servicio, el correo de ese dominio deja de entrar en
+    IONOS. Antes tienen que cumplirse tres cosas:
+    <ol>
+      <li><strong>El rescate está completo y verificado.</strong> Lo hago yo y
+          te aviso. IONOS no dice si desactivar el servicio toca los buzones;
+          no creemos que lo haga, pero no se arriesga el histórico por una suposición.</li>
+      <li><strong>forwardemail está listo</strong>: los tres dominios añadidos y
+          sus alias creados (los tres buzones reales y los tres <code>*</code>).
+          Si el dominio aún no existe en forwardemail cuando cambias los MX,
+          forwardemail rechaza el correo.</li>
+      <li><strong>Los tres buzones reales reenvían también a la Gmail.</strong>
+          Hasta que el Outlook de tu padre tenga los buzones nuevos, no verá
+          lo que entre en ellos; así no se le escapa nada esos días.</li>
+    </ol>
+  </div>
+
+  <div class="aviso aviso--ok">
+    <strong>Nada se pierde en el cambio.</strong>
+    En los minutos entre desactivar y poner los MX nuevos, los servidores que
+    envían correo no lo descartan: reintentan durante horas. Y si algo sale
+    mal, la marcha atrás está al final de esta página.
+  </div>
+
+  <section class="paso">
+    <span class="paso__num">Orden</span>
+    <h2>Un dominio cada vez, en este orden</h2>
+    <p>El primero sirve de ensayo: solo tiene reenvío, sin buzón real. Si algo
+       falla ahí, no afecta a nadie.</p>
+    <table class="t">
+      <tr><th></th><th>Dominio</th><th>Por qué en este puesto</th></tr>
+      <tr><td>1</td><td><code>micromagic.es</code></td><td>Ensayo: solo el <code>*</code> a la Gmail</td></tr>
+      <tr><td>2</td><td><code>micromagic.tv</code></td><td><code>administracion@</code> y <code>director@</code></td></tr>
+      <tr><td>3</td><td><code>rhinopaint.es</code></td><td><code>info@</code></td></tr>
+    </table>
+    <p>Haz los pasos 1 a 5 con un dominio y espera a que te confirme que
+       funciona antes de pasar al siguiente.</p>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 1</span>
+    <h2>Abrir el DNS del dominio</h2>
+    <ol>
+      <li>Entra en <a href="https://my.ionos.es">my.ionos.es</a> y ve a <strong>Dominios y SSL</strong>.</li>
+      <li>En la fila del dominio, debajo de <strong>Acciones</strong>, pulsa la
+          rueda dentada ⚙ y elige <strong>DNS</strong>.</li>
+    </ol>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 2</span>
+    <h2>Desactivar el servicio de correo</h2>
+    <p>
+      En la lista de registros, la columna <strong>Servicio</strong> dice qué
+      registros gestiona un servicio de IONOS. Busca el servicio al que
+      pertenecen los dos MX:
+    </p>
+    <div class="marcha">
+      <code>MX · @ · mx00.ionos.es · prioridad 10</code><br>
+      <code>MX · @ · mx01.ionos.es · prioridad 10</code>
+    </div>
+    <ol>
+      <li>En la fila de <strong>ese</strong> servicio, debajo de
+          <strong>Acciones</strong>, pulsa la rueda dentada ⚙ y elige
+          <strong>DESACTIVAR SERVICIO</strong>.</li>
+      <li>Confirma pulsando otra vez <strong>DESACTIVAR SERVICIO</strong>.</li>
+    </ol>
+    <p>Los MX de IONOS desaparecen. Puede que se vayan con ellos el SPF y el
+       <code>_dmarc</code>; es normal, los pasos 4 y 5 los reponen.</p>
+    <p class="nota">
+      Si los MX no tienen ningún servicio en esa columna, son registros sueltos:
+      bórralos con la rueda dentada ⚙ de cada uno.
+    </p>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 3 · justo después</span>
+    <h2>Poner los MX de forwardemail</h2>
+    <p>Pulsa <strong>Añadir registro</strong>, elige el tipo <strong>MX</strong> y
+       rellena así. Luego repite con el segundo.</p>
+    <div class="ficha">
+      <p class="ficha__titulo">Primer MX</p>
+      <div class="campo"><span class="campo__et">Nombre de host</span><span class="campo__val">@</span><span></span></div>
+      <div class="campo">
+        <span class="campo__et">Apunta a</span>
+        <span class="campo__val" id="mx1">mx1.forwardemail.net</span>
+        <button class="copiar" data-copia="mx1">Copiar</button>
+      </div>
+      <div class="campo"><span class="campo__et">Prioridad</span><span class="campo__val">0</span><span></span></div>
+    </div>
+    <div class="ficha">
+      <p class="ficha__titulo">Segundo MX</p>
+      <div class="campo"><span class="campo__et">Nombre de host</span><span class="campo__val">@</span><span></span></div>
+      <div class="campo">
+        <span class="campo__et">Apunta a</span>
+        <span class="campo__val" id="mx2">mx2.forwardemail.net</span>
+        <button class="copiar" data-copia="mx2">Copiar</button>
+      </div>
+      <div class="campo"><span class="campo__et">Prioridad</span><span class="campo__val">0</span><span></span></div>
+    </div>
+    <p class="nota">Si el formulario no acepta prioridad 0, pon 10 en los dos.
+       Lo que importa es que sean iguales.</p>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 4</span>
+    <h2>El SPF</h2>
+    <p>Mira si queda algún registro <strong>TXT</strong> cuyo valor empiece por
+       <code>v=spf1</code>:</p>
+    <ul>
+      <li><strong>Si queda</strong>, edítalo con la rueda dentada ⚙ y sustituye
+          su valor por el de abajo. <strong>No añadas un segundo.</strong></li>
+      <li><strong>Si no queda</strong>, <strong>Añadir registro</strong> → tipo
+          <strong>TXT</strong>, nombre de host <code>@</code>, y este valor.</li>
+    </ul>
+    <div class="ficha">
+      <div class="campo">
+        <span class="campo__et">TXT · @</span>
+        <span class="campo__val" id="spf">v=spf1 a include:spf.forwardemail.net ~all</span>
+        <button class="copiar" data-copia="spf">Copiar</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Paso 5</span>
+    <h2>DKIM y DMARC, y verificar</h2>
+    <ol>
+      <li>Si sigue habiendo un <strong>CNAME</strong> con nombre <code>_dmarc</code>
+          que apunta a <code>dmarc.ionos.es</code>, <strong>bórralo</strong>.
+          Dejará de funcionar al cancelar IONOS, y no puede convivir con el
+          DMARC nuevo.</li>
+      <li>Añade el <strong>DKIM</strong> y el <strong>DMARC</strong> que te da el
+          panel de forwardemail para ese dominio. Son distintos en cada uno,
+          por eso no están aquí.</li>
+      <li>En forwardemail, pulsa <strong>Verify Records</strong> en ese dominio.</li>
+      <li><strong>Dime «hecho» y el dominio</strong>: compruebo el DNS desde
+          aquí y te digo qué correos de prueba mandar.</li>
+    </ol>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Lo que hay que evitar</span>
+    <h2>Los cinco fallos que rompen algo</h2>
+
+    <div class="evitar">
+      <h3>1. Desactivar otro servicio</h3>
+      <p>En la misma lista puede haber un servicio para la web. Si lo desactivas,
+         <strong>la web se cae</strong>. Desactiva solo el que tiene los MX
+         <code>mx00</code> y <code>mx01</code>.</p>
+    </div>
+    <div class="evitar">
+      <h3>2. Borrar los CNAME largos con guion bajo de micromagic.tv</h3>
+      <p>Son los que validan el certificado de la web nueva. El único registro
+         con guion bajo que se toca es <code>_dmarc</code>.</p>
+    </div>
+    <div class="evitar">
+      <h3>3. Dejar un MX de IONOS</h3>
+      <p>Si conviven con los de forwardemail, parte del correo seguirá cayendo
+         en IONOS y parecerá que falla a ratos.</p>
+    </div>
+    <div class="evitar">
+      <h3>4. Dos registros SPF</h3>
+      <p>Un dominio solo admite uno. Con dos, el correo empieza a ir a spam.</p>
+    </div>
+    <div class="evitar">
+      <h3>5. Cancelar los buzones de IONOS</h3>
+      <p>Esto <strong>no</strong> cancela nada: los buzones y la licencia
+         siguen ahí. Se cancelan una semana después, cuando todo haya
+         funcionado y haya hecho la última descarga.</p>
+    </div>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Seguimiento</span>
+    <h2>Dominios hechos</h2>
+    <div class="dominio">
+      <h3>micromagic.es</h3>
+      <p>Solo reenvío. El ensayo.</p>
+      <ul class="tareas">
+        <li><input type="checkbox" id="es-a"><label for="es-a">Servicio de correo desactivado</label></li>
+        <li><input type="checkbox" id="es-b"><label for="es-b">Los dos MX de forwardemail puestos</label></li>
+        <li><input type="checkbox" id="es-c"><label for="es-c">Un solo SPF, el nuevo</label></li>
+        <li><input type="checkbox" id="es-d"><label for="es-d">DKIM y DMARC puestos, <code>_dmarc</code> de IONOS borrado</label></li>
+        <li><input type="checkbox" id="es-e"><label for="es-e">Confirmado por Claude</label></li>
+      </ul>
+    </div>
+    <div class="dominio">
+      <h3>micromagic.tv</h3>
+      <p>administracion@ y director@. No toques los CNAME del certificado.</p>
+      <ul class="tareas">
+        <li><input type="checkbox" id="tv-a"><label for="tv-a">Servicio de correo desactivado</label></li>
+        <li><input type="checkbox" id="tv-b"><label for="tv-b">Los dos MX de forwardemail puestos</label></li>
+        <li><input type="checkbox" id="tv-c"><label for="tv-c">Un solo SPF, el nuevo</label></li>
+        <li><input type="checkbox" id="tv-d"><label for="tv-d">DKIM y DMARC puestos, <code>_dmarc</code> de IONOS borrado</label></li>
+        <li><input type="checkbox" id="tv-e"><label for="tv-e">Confirmado por Claude</label></li>
+      </ul>
+    </div>
+    <div class="dominio">
+      <h3>rhinopaint.es</h3>
+      <p>info@.</p>
+      <ul class="tareas">
+        <li><input type="checkbox" id="rh-a"><label for="rh-a">Servicio de correo desactivado</label></li>
+        <li><input type="checkbox" id="rh-b"><label for="rh-b">Los dos MX de forwardemail puestos</label></li>
+        <li><input type="checkbox" id="rh-c"><label for="rh-c">Un solo SPF, el nuevo</label></li>
+        <li><input type="checkbox" id="rh-d"><label for="rh-d">DKIM y DMARC puestos, <code>_dmarc</code> de IONOS borrado</label></li>
+        <li><input type="checkbox" id="rh-e"><label for="rh-e">Confirmado por Claude</label></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="paso">
+    <span class="paso__num">Si algo sale mal</span>
+    <h2>Marcha atrás</h2>
+    <p>Borra los dos MX de forwardemail y vuelve a poner los de IONOS a mano.
+       Los buzones de IONOS siguen existiendo, así que el correo vuelve a
+       entrar en ellos en minutos.</p>
+    <p>Esto es lo que había el 7 de octubre:</p>
+    <table class="t">
+      <tr><th>Tipo</th><th>Nombre</th><th>Valor</th></tr>
+      <tr><td>MX</td><td>@</td><td><code>mx00.ionos.es</code> · prioridad 10</td></tr>
+      <tr><td>MX</td><td>@</td><td><code>mx01.ionos.es</code> · prioridad 10</td></tr>
+      <tr><td>TXT</td><td>@</td><td>micromagic.tv y rhinopaint.es:<br><code>v=spf1 include:spf.emdlv.net include:_spf-eu.ionos.com ?all</code><br>micromagic.es:<br><code>v=spf1 include:_spf-eu.ionos.com ~all</code></td></tr>
+      <tr><td>CNAME</td><td>_dmarc</td><td><code>dmarc.ionos.es</code></td></tr>
+    </table>
+    <p class="nota">Si IONOS no acepta los MX a mano con el servicio desactivado,
+       llama al asesor, Miguel Ángel Parra: <strong>+34 910 759 247</strong>.</p>
+  </section>
+
+  <footer>
+    Fuentes: IONOS Ayuda, <a href="https://www.ionos.es/ayuda/dominios/informacion-general-sobre-la-configuracion-dns/gestionar-servicios-dns/">Gestionar servicios DNS</a>
+    y <a href="https://www.ionos.com/help/domains/configuring-mail-servers-and-other-related-records/using-a-domain-with-another-providers-mail-servers-editing-mx-records/">MX de otro proveedor</a>.
+    IONOS no publica el nombre exacto de su servicio de correo en esa lista:
+    reconócelo por los MX <code>mx00</code>/<code>mx01</code>.
+    · Guía anterior: <code>docs/correo-a-gmail.html</code>
+  </footer>
+</div>
+
+<script>
+  document.querySelectorAll('.copiar').forEach(function (b) {
+    var campo = document.getElementById(b.dataset.copia);
+    b.addEventListener('click', function () {
+      var texto = campo.textContent.trim();
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(texto).then(
+          function () { avisar(b, true); },
+          function () { respaldo(b, campo, texto); }
+        );
+      } else { respaldo(b, campo, texto); }
+    });
+  });
+
+  // Abierta como file://, la API del portapapeles puede estar bloqueada.
+  function respaldo(b, campo, texto) {
+    var a = document.createElement('textarea');
+    a.value = texto;
+    a.style.cssText = 'position:fixed;top:-100px;opacity:0';
+    document.body.appendChild(a);
+    a.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(a);
+    if (ok) { avisar(b, true); return; }
+    var sel = window.getSelection(), r = document.createRange();
+    r.selectNodeContents(campo); sel.removeAllRanges(); sel.addRange(r);
+    avisar(b, false);
+  }
+
+  function avisar(b, ok) {
+    if (b.dataset.original === undefined) b.dataset.original = b.textContent;
+    b.textContent = ok ? 'Copiado' : 'Pulsa ⌘C';
+    b.classList.toggle('hecho', ok);
+    b.classList.toggle('manual', !ok);
+    clearTimeout(b._t);
+    b._t = setTimeout(function () {
+      b.textContent = b.dataset.original;
+      b.classList.remove('hecho', 'manual');
+    }, ok ? 1600 : 4000);
+  }
+
+  // Tres dominios con los mismos pasos: es fácil perder la cuenta.
+  document.querySelectorAll('ul.tareas input').forEach(function (c) {
+    try { c.checked = localStorage.getItem('desact-' + c.id) === '1'; } catch (e) {}
+    c.addEventListener('change', function () {
+      try { localStorage.setItem('desact-' + c.id, c.checked ? '1' : '0'); } catch (e) {}
+    });
+  });
+</script>
+</body>
+</html>
