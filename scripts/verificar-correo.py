@@ -78,11 +78,17 @@ def examinar(imap: imaplib.IMAP4_SSL, nombre: str) -> int:
     return int(datos[0])
 
 
-def fecha(imap: imaplib.IMAP4_SSL, cual: str) -> str:
-    """INTERNALDATE del mensaje '1' (el más antiguo) o '*' (el último)."""
-    _, datos = imap.fetch(cual, "(INTERNALDATE)")
-    t = imaplib.Internaldate2tuple(datos[0]) if datos and datos[0] else None
-    return time.strftime("%Y-%m-%d", t) if t else "?"
+def fechas(imap: imaplib.IMAP4_SSL) -> tuple[str, str]:
+    """La fecha de llegada más antigua y la más reciente de la carpeta abierta.
+
+    Hay que mirarlas todas: el orden de los mensajes es el de guardado, y un
+    buzón importado guarda primero correos más nuevos que algunos que vienen
+    detrás.
+    """
+    _, datos = imap.fetch("1:*", "(INTERNALDATE)")
+    tuplas = [imaplib.Internaldate2tuple(d) for d in datos if isinstance(d, bytes)]
+    dias = sorted(time.strftime("%Y-%m-%d", t) for t in tuplas if t)
+    return (dias[0], dias[-1]) if dias else ("?", "?")
 
 
 def locales(carpeta: Path) -> int:
@@ -139,10 +145,10 @@ def main() -> int:
                 problemas += 1
                 continue
             if nombre.upper() == "INBOX" and n_srv:
-                mas_antiguo = fecha(imap, "1")
+                mas_antiguo = fechas(imap)[0]
             enviados = "\\Sent" in flags or nombre.lower() in ("elementos enviados", "sent")
             if enviados and n_srv:
-                ultimo_enviado = fecha(imap, "*")
+                ultimo_enviado = fechas(imap)[1]
             total_srv += n_srv
 
             if origen is None:
