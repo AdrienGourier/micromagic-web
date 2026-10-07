@@ -98,6 +98,17 @@
     forwardemail. Un dominio cada vez, unos diez minutos cada uno.
   </p>
 
+  <div class="aviso aviso--ok">
+    <strong>Hecho el 7 de octubre de 2026, los tres dominios.</strong>
+    Lo hizo Claude en el panel. Lo que se aplicó y difiere de los pasos de abajo:
+    forwardemail pide además un TXT <code>forward-email-site-verification=…</code>
+    y un CNAME <code>fe-bounces</code> → <code>forwardemail.net</code>; el SPF
+    conserva <code>include:_spf-eu.ionos.com</code> (y <code>spf.emdlv.net</code>
+    donde estaba) hasta cancelar IONOS; el DMARC va en <code>p=none</code>; y
+    «DMARC» y «SPF» son servicios de IONOS aparte de «Mail». Desactivar «Mail»
+    no borró los buzones: siguen accesibles por IMAP.
+  </div>
+
   <div class="aviso">
     <strong>No pulses nada hasta que te dé luz verde.</strong>
     En cuanto desactivas el servicio, el correo de ese dominio deja de entrar en
