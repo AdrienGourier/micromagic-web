@@ -150,28 +150,30 @@
 
   <section class="paso">
     <span class="paso__num">Paso 2</span>
-    <h2>Desactivar el servicio de correo</h2>
+    <h2>Desactivar el servicio «Mail»</h2>
+    <p>
+      Si intentas borrar los MX directamente, IONOS lo impide con este aviso:
+    </p>
+    <div class="marcha">
+      «Este registro DNS pertenece a un servicio. Primero, desactive el servicio Mail.»
+    </div>
     <p>
       En la lista de registros, la columna <strong>Servicio</strong> dice qué
-      registros gestiona un servicio de IONOS. Busca el servicio al que
-      pertenecen los dos MX:
+      registros gestiona un servicio de IONOS. El que hay que desactivar se
+      llama <strong>Mail</strong>, y es el que tiene estos dos MX:
     </p>
     <div class="marcha">
       <code>MX · @ · mx00.ionos.es · prioridad 10</code><br>
       <code>MX · @ · mx01.ionos.es · prioridad 10</code>
     </div>
     <ol>
-      <li>En la fila de <strong>ese</strong> servicio, debajo de
+      <li>En la fila del servicio <strong>Mail</strong>, debajo de
           <strong>Acciones</strong>, pulsa la rueda dentada ⚙ y elige
           <strong>DESACTIVAR SERVICIO</strong>.</li>
       <li>Confirma pulsando otra vez <strong>DESACTIVAR SERVICIO</strong>.</li>
     </ol>
     <p>Los MX de IONOS desaparecen. Puede que se vayan con ellos el SPF y el
        <code>_dmarc</code>; es normal, los pasos 4 y 5 los reponen.</p>
-    <p class="nota">
-      Si los MX no tienen ningún servicio en esa columna, son registros sueltos:
-      bórralos con la rueda dentada ⚙ de cada uno.
-    </p>
   </section>
 
   <section class="paso">
@@ -247,8 +249,7 @@
     <div class="evitar">
       <h3>1. Desactivar otro servicio</h3>
       <p>En la misma lista puede haber un servicio para la web. Si lo desactivas,
-         <strong>la web se cae</strong>. Desactiva solo el que tiene los MX
-         <code>mx00</code> y <code>mx01</code>.</p>
+         <strong>la web se cae</strong>. Desactiva solo <strong>Mail</strong>.</p>
     </div>
     <div class="evitar">
       <h3>2. Borrar los CNAME largos con guion bajo de micromagic.tv</h3>
@@ -279,7 +280,7 @@
       <h3>micromagic.es</h3>
       <p>Solo reenvío. El ensayo.</p>
       <ul class="tareas">
-        <li><input type="checkbox" id="es-a"><label for="es-a">Servicio de correo desactivado</label></li>
+        <li><input type="checkbox" id="es-a"><label for="es-a">Servicio Mail desactivado</label></li>
         <li><input type="checkbox" id="es-b"><label for="es-b">Los dos MX de forwardemail puestos</label></li>
         <li><input type="checkbox" id="es-c"><label for="es-c">Un solo SPF, el nuevo</label></li>
         <li><input type="checkbox" id="es-d"><label for="es-d">DKIM y DMARC puestos, <code>_dmarc</code> de IONOS borrado</label></li>
@@ -290,7 +291,7 @@
       <h3>micromagic.tv</h3>
       <p>administracion@ y director@. No toques los CNAME del certificado.</p>
       <ul class="tareas">
-        <li><input type="checkbox" id="tv-a"><label for="tv-a">Servicio de correo desactivado</label></li>
+        <li><input type="checkbox" id="tv-a"><label for="tv-a">Servicio Mail desactivado</label></li>
         <li><input type="checkbox" id="tv-b"><label for="tv-b">Los dos MX de forwardemail puestos</label></li>
         <li><input type="checkbox" id="tv-c"><label for="tv-c">Un solo SPF, el nuevo</label></li>
         <li><input type="checkbox" id="tv-d"><label for="tv-d">DKIM y DMARC puestos, <code>_dmarc</code> de IONOS borrado</label></li>
@@ -301,7 +302,7 @@
       <h3>rhinopaint.es</h3>
       <p>info@.</p>
       <ul class="tareas">
-        <li><input type="checkbox" id="rh-a"><label for="rh-a">Servicio de correo desactivado</label></li>
+        <li><input type="checkbox" id="rh-a"><label for="rh-a">Servicio Mail desactivado</label></li>
         <li><input type="checkbox" id="rh-b"><label for="rh-b">Los dos MX de forwardemail puestos</label></li>
         <li><input type="checkbox" id="rh-c"><label for="rh-c">Un solo SPF, el nuevo</label></li>
         <li><input type="checkbox" id="rh-d"><label for="rh-d">DKIM y DMARC puestos, <code>_dmarc</code> de IONOS borrado</label></li>
@@ -331,8 +332,7 @@
   <footer>
     Fuentes: IONOS Ayuda, <a href="https://www.ionos.es/ayuda/dominios/informacion-general-sobre-la-configuracion-dns/gestionar-servicios-dns/">Gestionar servicios DNS</a>
     y <a href="https://www.ionos.com/help/domains/configuring-mail-servers-and-other-related-records/using-a-domain-with-another-providers-mail-servers-editing-mx-records/">MX de otro proveedor</a>.
-    IONOS no publica el nombre exacto de su servicio de correo en esa lista:
-    reconócelo por los MX <code>mx00</code>/<code>mx01</code>.
+    El nombre «Mail» y el aviso salen del panel real (captura del 7 de octubre).
     · Guía anterior: <code>docs/correo-a-gmail.html</code>
   </footer>
 </div>
