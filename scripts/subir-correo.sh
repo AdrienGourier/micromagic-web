@@ -5,6 +5,11 @@
 # mbsync sincroniza en ambos sentidos: el mismo Maildir que se descargó con
 # `Sync Pull` se sube aquí con `Sync Push`.
 #
+# El almacén remoto se llama distinto que en rescatar-correo.sh a propósito:
+# mbsync nombra su estado por almacén, y con el mismo nombre leería el estado
+# de IONOS, creería los correos ya subidos y no subiría nada.
+# CopyArrivalDate conserva la fecha de llegada original (la del fichero).
+#
 # Credenciales en ~/.forwardemail-correo, chmod 600, FUERA del repo. Una línea
 # por buzón, 'direccion:contraseña'. OJO: la contraseña NO es la de la cuenta de
 # forwardemail, sino la que genera su panel para cada alias.
@@ -81,7 +86,7 @@ Pass "$clave"
 TLSType IMAPS
 PipelineDepth 1
 
-IMAPStore $canal-remoto
+IMAPStore $canal-forwardemail
 Account $canal
 
 MaildirStore $canal-local
@@ -90,12 +95,13 @@ Inbox $carpeta/INBOX
 SubFolders Verbatim
 
 Channel $canal
-Far :$canal-remoto:
+Far :$canal-forwardemail:
 Near :$canal-local:
 Patterns *
 Create Far
 Expunge None
 Sync Push
+CopyArrivalDate yes
 EOF
   chmod 600 "$CONF"
 

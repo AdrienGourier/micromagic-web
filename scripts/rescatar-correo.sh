@@ -6,6 +6,10 @@
 # Usa mbsync (isync), que sincroniza IMAP contra un Maildir local.
 # imapsync NO sirve aquí: solo va de servidor a servidor.
 #
+# CopyArrivalDate guarda la fecha de llegada de cada correo como fecha del
+# fichero. Sin ella, al subirlos a otro servidor todos parecerían recibidos el
+# día del rescate y Outlook, que ordena por esa fecha, los mezclaría.
+#
 #   brew install isync
 #
 # Credenciales en ~/.ionos-correo, chmod 600, FUERA del repo. Una línea por
@@ -73,7 +77,7 @@ Pass "$clave"
 TLSType IMAPS
 PipelineDepth 1
 
-IMAPStore $canal-remoto
+IMAPStore $canal-ionos
 Account $canal
 
 MaildirStore $canal-local
@@ -82,12 +86,13 @@ Inbox $carpeta/INBOX
 SubFolders Verbatim
 
 Channel $canal
-Far :$canal-remoto:
+Far :$canal-ionos:
 Near :$canal-local:
 Patterns *
 Create Near
 Expunge None
 Sync Pull
+CopyArrivalDate yes
 EOF
   chmod 600 "$CONF"
 
