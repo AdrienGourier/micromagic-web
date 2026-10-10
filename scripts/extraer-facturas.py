@@ -12,6 +12,9 @@ Uso:
   python3 scripts/extraer-facturas.py                      los dos buzones de facturas
   python3 scripts/extraer-facturas.py --desde 2026-07-01   solo desde esa fecha
   python3 scripts/extraer-facturas.py --salida ~/Desktop/Facturas
+  python3 scripts/extraer-facturas.py --desde 2026-04-01 --por-mes
+      una carpeta por mes, y dentro cada buzón con Recibidas y Enviadas: lo
+      que pide la contabilidad trimestral
 """
 import argparse, csv, email, hashlib, html, re, sys, urllib.parse
 from datetime import date, datetime
@@ -24,6 +27,9 @@ SALTAR = {"spam", "borradores", "drafts", "junk"}
 CLAVE = re.compile(r"factur|invoice|recibo|abono|rectificativ", re.I)
 ADJUNTO = (".pdf", ".xml", ".xsig")
 NOMBRE_MAX = 90
+MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
+         "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+ENVIADOS = {"elementos enviados", "enviados", "sent", "sent items", "sent messages"}
 
 
 def seguro(texto: str) -> str:
@@ -92,6 +98,9 @@ def main() -> int:
     ap.add_argument("--rescate", help="carpeta ~/Backups/ionos-correo-<fecha>")
     ap.add_argument("--salida", default="~/Desktop/Facturas-correo")
     ap.add_argument("--desde", help="AAAA-MM-DD")
+    ap.add_argument("--hasta", help="AAAA-MM-DD, incluido")
+    ap.add_argument("--por-mes", action="store_true",
+                    help="carpeta por mes primero, con Recibidas/Enviadas por buzón")
     args = ap.parse_args()
 
     if args.rescate:
@@ -102,6 +111,7 @@ def main() -> int:
     if not origen or not origen.is_dir():
         sys.exit("No encuentro el rescate. Ejecuta antes ./scripts/rescatar-correo.sh")
     desde = date.fromisoformat(args.desde) if args.desde else None
+    hasta = date.fromisoformat(args.hasta) if args.hasta else None
     salida = Path(args.salida).expanduser()
     if salida.exists() and any(salida.iterdir()):
         sys.exit(f"{salida} ya existe y no está vacía: bórrala o elige otra con --salida")
@@ -110,7 +120,9 @@ def main() -> int:
     filas = []
     for direccion in BUZONES:
         buzon = origen / direccion
-        vistos: dict[str, Path] = {}   # mismo PDF reenviado varias veces: se guarda una
+        # El mismo PDF reenviado varias veces se guarda una vez por carpeta: así
+        # cada carpeta de mes se basta sola.
+        vistos: dict[tuple[str, Path], Path] = {}
         revisados = 0
         for carpeta in carpetas(buzon):
             nombre_carpeta = carpeta.relative_to(buzon).as_posix() if carpeta != buzon else "INBOX"
@@ -118,7 +130,7 @@ def main() -> int:
                 revisados += 1
                 # La fecha del fichero es la de llegada al buzón (CopyArrivalDate).
                 llegada = datetime.fromtimestamp(f.stat().st_mtime)
-                if desde and llegada.date() < desde:
+                if (desde and llegada.date() < desde) or (hasta and llegada.date() > hasta):
                     continue
                 try:
                     msg = email.message_from_bytes(f.read_bytes(), policy=policy.default)
@@ -132,7 +144,12 @@ def main() -> int:
                     continue
 
                 dia = llegada.strftime("%Y-%m-%d")
-                destino = salida / direccion / llegada.strftime("%Y-%m")
+                if args.por_mes:
+                    lado = "Enviadas" if nombre_carpeta.lower() in ENVIADOS else "Recibidas"
+                    mes = f"{llegada:%Y-%m} {MESES[llegada.month - 1]}"
+                    destino = salida / mes / direccion / lado
+                else:
+                    destino = salida / direccion / llegada.strftime("%Y-%m")
                 destino.mkdir(parents=True, exist_ok=True)
                 prefijo = seguro(f"{dia} {remitente(de)}")
                 eml = unico(destino / f"{seguro(f'{prefijo} - {asunto or 'sin asunto'}')}.eml")
@@ -140,7 +157,7 @@ def main() -> int:
 
                 ficheros = []
                 for nombre, datos in adj:
-                    h = hashlib.sha256(datos).hexdigest()
+                    h = (hashlib.sha256(datos).hexdigest(), destino)
                     if h not in vistos:
                         stem, ext = Path(nombre).stem, Path(nombre).suffix.lower() or ".pdf"
                         ruta = unico(destino / f"{seguro(f'{prefijo} - {stem}')}{ext}")
@@ -173,8 +190,14 @@ def escribir_csv(salida: Path, filas) -> None:
 
 def escribir_indice(salida: Path, filas, origen: Path) -> None:
     e = html.escape
-    cuerpo = []
+    cuerpo, mes_actual = [], None
     for r in filas:
+        mes = (r["llegada"].year, r["llegada"].month)
+        if mes != mes_actual:
+            n = sum(1 for x in filas if (x["llegada"].year, x["llegada"].month) == mes)
+            cuerpo.append(f'<tr class="mes"><th colspan="5">{MESES[mes[1] - 1]} {mes[0]}'
+                          f' <small>· {n} correos</small></th></tr>')
+            mes_actual = mes
         adj = " ".join(f'<a href="{enlace(salida, a)}">{e(a.suffix[1:].upper())}</a>' for a in r["adjuntos"])
         cuerpo.append(
             f'<tr><td class="f">{r["llegada"]:%d/%m/%Y}</td><td>{e(r["buzon"].split("@")[0])}'
@@ -195,6 +218,8 @@ def escribir_indice(salida: Path, filas, origen: Path) -> None:
   table{{border-collapse:collapse;width:100%;font-size:.95rem}}
   th,td{{border-bottom:1px solid #ddd;padding:.5rem .6rem;text-align:left;vertical-align:top}}
   th{{background:#f3f3f1;position:sticky;top:0}}
+  tr.mes th{{background:#111;color:#fff;font-size:1.05rem;position:static;padding:.7rem .6rem}}
+  tr.mes small{{color:#bbb;font-weight:400}}
   td.f{{white-space:nowrap;font-variant-numeric:tabular-nums}}
   td.a a{{display:inline-block;background:#111;color:#fff;text-decoration:none;
          padding:.15rem .5rem;margin:0 .2rem .2rem 0;font-size:.8rem;font-weight:700}}
@@ -212,7 +237,7 @@ El correo llegado después a forwardemail está también en la Hotmail de copia.
 {chr(10).join(cuerpo)}
 </tbody></table></div>
 <script>
-  var q = document.getElementById('q'), filas = document.querySelectorAll('tbody tr');
+  var q = document.getElementById('q'), filas = document.querySelectorAll('tbody tr:not(.mes)');
   q.addEventListener('input', function () {{
     var t = q.value.toLowerCase();
     filas.forEach(function (f) {{ f.style.display = f.textContent.toLowerCase().indexOf(t) < 0 ? 'none' : ''; }});
