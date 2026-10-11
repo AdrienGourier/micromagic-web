@@ -267,10 +267,18 @@ def main() -> int:
         # El mismo PDF reenviado varias veces se guarda una vez por carpeta: así
         # cada carpeta de mes se basta sola.
         vistos: dict[tuple[str, Path], Path] = {}
+        # Un correo que está dos veces en el buzón (una subida cortada a medias
+        # lo deja repetido) sale una sola vez. Enviado y recibido van aparte:
+        # lo que uno se manda a sí mismo está en los dos lados.
+        ya: set[tuple[str, bool]] = set()
         revisados = 0
         try:
             for llegada, nombre_carpeta, enviado, crudo in correos:
                 revisados += 1
+                clave_ya = (identidad(crudo), enviado)
+                if clave_ya in ya:
+                    continue
+                ya.add(clave_ya)
                 try:
                     msg = email.message_from_bytes(crudo, policy=policy.default)
                     asunto = str(msg.get("Subject", "") or "")
