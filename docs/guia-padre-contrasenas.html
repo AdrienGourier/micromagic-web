@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Correo de la empresa — qué necesito de ti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  /* Pensado para imprimir en A4 y para leerse en pantalla sin gafas. */
+  @page { size: A4; margin: 18mm 16mm 16mm; }
+
+  :root{
+    --tinta:#111;
+    --suave:#555;
+    --linea:#bbb;
+    --caja:#f2f2ef;
+    --aviso:#b3301c;
+    --bien:#15682f;
+    --azul:#14538c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:#fff; color:var(--tinta);
+    font-family:Archivo,system-ui,-apple-system,'Helvetica Neue',sans-serif;
+    font-size:12.5pt; line-height:1.55;
+  }
+  .hoja{max-width:180mm; margin-inline:auto; padding:0}
+
+  h1{font-variation-settings:'wdth' 112,'wght' 800; font-size:26pt; line-height:1.08;
+     margin:0 0 .3em; letter-spacing:-.01em}
+  h2{font-variation-settings:'wdth' 108,'wght' 700; font-size:16pt; margin:0 0 .35em; line-height:1.15}
+  h3{font-variation-settings:'wdth' 100,'wght' 700; font-size:12.5pt; margin:1.1em 0 .3em}
+  p{margin:0 0 .75em; max-width:62ch}
+
+  .intro{font-size:13.5pt; color:var(--suave); max-width:55ch}
+
+  .seccion{page-break-before:always; padding-top:0}
+
+  .etiqueta{display:inline-block; font-size:9.5pt; font-variation-settings:'wdth' 100,'wght' 700;
+            letter-spacing:.04em; border:1.5px solid var(--tinta); padding:2px 8px; margin-bottom:.6em}
+
+  ol.pasos{counter-reset:p; list-style:none; padding:0; margin:1em 0}
+  ol.pasos > li{counter-increment:p; position:relative; padding-left:13mm; margin-bottom:1.1em;
+                page-break-inside:avoid}
+  ol.pasos > li::before{
+    content:counter(p); position:absolute; left:0; top:-1px;
+    width:9mm; height:9mm; border-radius:50%; background:var(--tinta); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11pt; font-variation-settings:'wdth' 100,'wght' 800;
+  }
+  ol.pasos strong{font-variation-settings:'wdth' 100,'wght' 700}
+
+  .ruta{background:var(--caja); border-left:4px solid var(--tinta); padding:.5em .8em;
+        margin:.5em 0; font-size:11.5pt}
+  .ruta b{font-variation-settings:'wdth' 100,'wght' 700}
+
+  .aviso{border:2px solid var(--aviso); padding:.7em .9em; margin:1em 0; page-break-inside:avoid}
+  .aviso strong{color:var(--aviso)}
+  .tranquilo{border:2px solid var(--bien); padding:.7em .9em; margin:1em 0; page-break-inside:avoid}
+  .tranquilo strong{color:var(--bien)}
+
+  .bifurca{display:grid; grid-template-columns:1fr 1fr; gap:6mm; margin:1.2em 0}
+  .opcion{border:2px solid var(--linea); padding:.8em .9em}
+  .opcion h3{margin-top:0}
+  .opcion p{font-size:11.5pt; margin-bottom:.4em}
+  .opcion .vas{font-variation-settings:'wdth' 100,'wght' 800; color:var(--azul); font-size:11.5pt}
+
+  table.form{border-collapse:collapse; width:100%; margin:1em 0; font-size:11.5pt}
+  table.form th,table.form td{border:1.5px solid var(--tinta); padding:7px 8px; text-align:left}
+  table.form th{background:var(--caja); font-variation-settings:'wdth' 100,'wght' 700; font-size:10.5pt}
+  table.form td{height:11.5mm}
+  table.form td.dir{font-family:ui-monospace,Menlo,monospace; font-size:10.5pt}
+  .vacia td{background:#fff}
+
+  .nota{color:var(--suave); font-size:11pt}
+  .firma{margin-top:2em; padding-top:.8em; border-top:1.5px solid var(--linea); color:var(--suave); font-size:11pt}
+
+  @media screen{
+    body{background:#eceae5; padding:10mm 4mm}
+    .hoja{background:#fff; max-width:200mm; padding:14mm; box-shadow:0 2px 18px rgba(0,0,0,.12)}
+    .seccion{page-break-before:auto; border-top:1px dashed var(--linea); margin-top:10mm; padding-top:8mm}
+    .seccion:first-of-type{border-top:0; margin-top:0}
+  }
+</style>
+</head>
+<body>
+<div class="hoja">
+
+  <h1>El correo de la empresa</h1>
+  <p class="intro">
+    Papá, estamos moviendo el correo y la web a un sistema nuevo. Vamos a pasar
+    de pagar <strong>63 € al mes</strong> a unos 4 €. Para no perder ni un correo
+    viejo necesito una cosa tuya: <strong>las contraseñas de los buzones</strong>.
+  </p>
+
+  <div class="tranquilo">
+    <strong>Nada de esto rompe nada hoy.</strong>
+    Tu Outlook sigue funcionando igual mientras haces esto. No vas a borrar ni
+    cambiar nada: solo mirar, y apuntar en la última hoja.
+  </div>
+
+  <p>Son tres cosas, por este orden:</p>
+  <ol class="pasos">
+    <li><strong>Mirar qué Outlook tienes.</strong> Hay dos y no se hacen igual.
+        Es lo primero y lleva diez segundos.</li>
+    <li><strong>Intentar ver las contraseñas.</strong> A veces se pueden ver, a
+        veces no. Si no salen, no pasa absolutamente nada.</li>
+    <li><strong>Rellenar la hoja del final</strong> con las direcciones de correo
+        que tengas, salgan las contraseñas o no.</li>
+  </ol>
+
+  <p class="nota">
+    Si en algún paso no ves lo que pone aquí, no te pelees: salta al siguiente y
+    me lo dices. Tengo otra forma de hacerlo que no depende de esto.
+  </p>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <section class="seccion">
+    <span class="etiqueta">PRIMERO</span>
+    <h2>¿Qué Outlook tienes?</h2>
+    <p>Abre Outlook y mira la esquina de arriba a la izquierda.</p>
+
+    <div class="bifurca">
+      <div class="opcion">
+        <h3>Pone «Archivo»</h3>
+        <p>Arriba del todo, a la izquierda, ves una pestaña que dice
+           <strong>Archivo</strong>, junto a Inicio, Enviar y recibir, etc.</p>
+        <p class="vas">→ Es el Outlook clásico.<br>Puedes seguir en la hoja siguiente.</p>
+      </div>
+      <div class="opcion">
+        <h3>No pone «Archivo»</h3>
+        <p>No hay pestaña Archivo. Arriba a la derecha hay una
+           <strong>rueda dentada ⚙</strong> para los ajustes.</p>
+        <p class="vas">→ Es el Outlook nuevo.<br>Sáltate la hoja siguiente y ve directo a la hoja de apuntar.</p>
+      </div>
+    </div>
+
+    <div class="aviso">
+      <strong>Si tienes el Outlook nuevo, las contraseñas no se pueden ver.</strong>
+      Microsoft las quitó de la vista. No es culpa tuya ni hay truco: ve
+      directamente a la última hoja y apunta solo las <em>direcciones</em> de
+      correo. Con eso me vale.
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <section class="seccion">
+    <span class="etiqueta">SOLO SI TIENES EL OUTLOOK CLÁSICO</span>
+    <h2>Intentar ver una contraseña</h2>
+    <p>Hay que repetir esto por cada cuenta de correo que tengas. Tranquilo, es rápido.</p>
+
+    <ol class="pasos">
+      <li>
+        Pulsa la pestaña <strong>Archivo</strong>, arriba a la izquierda.
+      </li>
+      <li>
+        Pulsa <strong>Configuración de la cuenta</strong> y, en el menú que se
+        abre, vuelve a pulsar <strong>Configuración de la cuenta</strong>.
+        <div class="ruta"><b>Archivo → Configuración de la cuenta → Configuración de la cuenta</b></div>
+      </li>
+      <li>
+        Se abre una ventana con la lista de tus cuentas de correo.
+        <strong>Haz clic en una</strong> para seleccionarla (se pone azul).
+      </li>
+      <li>
+        Pulsa el botón <strong>Reparar</strong>, arriba de la lista.
+        <p class="nota">No te asustes por el nombre: no va a reparar ni cambiar
+           nada todavía. Solo abre la ventana donde están los datos.</p>
+      </li>
+      <li>
+        Se abre una ventana con tu dirección de correo. Si ves un botón que pone
+        <strong>Opciones avanzadas</strong>, pulsa ahí y marca la casilla de
+        configurar manualmente. Luego pulsa <strong>Reparar</strong> otra vez.
+      </li>
+      <li>
+        Ahora busca el campo <strong>Contraseña</strong>. Si tiene puntitos
+        (<strong>••••••••</strong>) y al lado un <strong>dibujo de un ojo 👁</strong>,
+        pulsa el ojo: la contraseña se verá.
+        <p><strong>Apúntala en la última hoja.</strong></p>
+      </li>
+      <li>
+        Cierra todas las ventanas con <strong>Cancelar</strong>, nunca con
+        Guardar ni Siguiente. Así te aseguras de no cambiar nada.
+      </li>
+    </ol>
+
+    <div class="aviso">
+      <strong>¿No aparece el ojo?</strong>
+      Entonces en tu versión no se puede ver, y no hay nada más que hacer por ahí.
+      Cierra con <strong>Cancelar</strong> y pasa a la última hoja: apunta solo
+      las direcciones. De verdad que no es un problema.
+    </div>
+
+    <h3>Si te pide la contraseña y no la sabes</h3>
+    <p>
+      Puede que en algún momento Outlook te muestre una ventanita pidiendo la
+      contraseña. <strong>Dale a Cancelar.</strong> No escribas nada inventado:
+      si fallas varias veces, el correo puede bloquearse un rato.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <section class="seccion">
+    <span class="etiqueta">PARA RELLENAR</span>
+    <h2>La hoja</h2>
+    <p>
+      Esto es lo que necesito de verdad. <strong>Lo importante son las
+      direcciones</strong>: las contraseñas, si salen, mejor; si no, ya las
+      cambio yo.
+    </p>
+
+    <h3>¿Dónde veo mis direcciones de correo?</h3>
+    <div class="ruta">
+      <b>Outlook clásico:</b> Archivo → Configuración de la cuenta → Configuración de la cuenta.
+      Salen todas en una lista.
+    </div>
+    <div class="ruta">
+      <b>Outlook nuevo:</b> rueda dentada ⚙ → Cuentas → Cuentas de correo electrónico.
+    </div>
+
+    <p>
+      He apuntado las cuatro que ya conozco. <strong>Faltan al menos dos</strong>
+      que estamos pagando y que no sé cuáles son: si ves alguna más en esa lista,
+      escríbela en las filas vacías.
+    </p>
+
+    <table class="form">
+      <thead>
+        <tr>
+          <th style="width:46%">Dirección de correo</th>
+          <th style="width:34%">Contraseña (si ha salido)</th>
+          <th style="width:20%">¿La usas?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="dir">info@micromagic.tv</td><td></td><td></td></tr>
+        <tr><td class="dir">administracion@micromagic.tv</td><td></td><td></td></tr>
+        <tr><td class="dir">info@rhinopaint.es</td><td></td><td></td></tr>
+        <tr><td class="dir">info@bacoban.es</td><td></td><td></td></tr>
+        <tr class="vacia"><td></td><td></td><td></td></tr>
+        <tr class="vacia"><td></td><td></td><td></td></tr>
+        <tr class="vacia"><td></td><td></td><td></td></tr>
+        <tr class="vacia"><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+
+    <p class="nota">
+      En «¿La usas?» basta con poner <strong>sí</strong> o <strong>no</strong>.
+      Me sirve para saber cuáles conservamos y cuáles dejamos morir.
+    </p>
+
+    <div class="aviso">
+      <strong>No me mandes esto por correo.</strong>
+      Son contraseñas: dámelo en mano, por teléfono, o por WhatsApp y luego
+      borras el mensaje. De todas formas estas cuentas se cierran en unas
+      semanas, así que el riesgo dura poco.
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <section class="seccion">
+    <span class="etiqueta">LO QUE PASA DESPUÉS</span>
+    <h2>Para que estés tranquilo</h2>
+
+    <p>
+      Con las direcciones, yo descargo todo el correo viejo a mi ordenador y lo
+      guardo. Nada se pierde.
+    </p>
+    <p>
+      Después cambiaré las contraseñas desde el panel de la empresa. Cuando lo
+      haga, <strong>tu Outlook te pedirá la contraseña nueva</strong> — es
+      normal, no es que se haya roto. Te la paso y la escribes una vez:
+    </p>
+
+    <ol class="pasos">
+      <li>Outlook muestra una ventana pidiendo la contraseña.</li>
+      <li>Escribes la nueva que te mande.</li>
+      <li>Marcas la casilla <strong>Recordar contraseña</strong> o
+          <strong>Guardar</strong>, para que no te la pida más.</li>
+      <li>Aceptar. Y ya está.</li>
+    </ol>
+
+    <p>
+      Si no te sale sola esa ventana, me avisas y lo vemos juntos por teléfono.
+      Es un minuto.
+    </p>
+
+    <div class="tranquilo">
+      <strong>El correo no se corta en ningún momento.</strong>
+      Las direcciones siguen siendo las mismas y lo que te llegue te seguirá
+      llegando. Lo único que cambia es quién nos lo guarda, y que pasamos a pagar
+      unos 4 € al mes en vez de 63.
+    </div>
+
+    <p class="firma">
+      Cualquier duda, me llamas y lo hacemos juntos. No hay prisa y no se puede
+      romper nada. — Adrien
+    </p>
+  </section>
+
+</div>
+</body>
+</html>

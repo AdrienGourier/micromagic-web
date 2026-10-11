@@ -1,0 +1,229 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  titulo: string;
+  descripcion?: string;
+  imagen?: string;
+}
+
+const {
+  titulo,
+  descripcion = 'La auténtica esponja mágica de melamina, fabricada en España desde 2009. Limpia solo con agua.',
+  imagen = '/uploads/2024/12/micro-magic-borrador-magico-esponja-profesional-original.jpg',
+} = Astro.props;
+
+const canonica = new URL(Astro.url.pathname, Astro.site);
+
+const menu = [
+  { href: '/que-es-la-esponja-micromagic/', texto: 'Qué es' },
+  { href: '/composicion/', texto: 'De qué está hecha' },
+  { href: '/automocion/', texto: 'Automoción' },
+  { href: '/micromagic-profesional/', texto: 'Profesional' },
+  { href: '/esponja-micromagic/', texto: 'Formatos' },
+  { href: '/preguntas-frecuentes/', texto: 'Preguntas' },
+];
+
+const WHATSAPP = 'https://wa.me/34630181219';
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{titulo}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={canonica} />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:image" content={new URL(imagen, Astro.site)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+    <header class="cabecera">
+      <div class="envoltorio cabecera__fila">
+        <a class="marca" href="/">
+          <span class="marca__nombre">MICROMAGIC</span>
+          <span class="marca__desde">desde 2009</span>
+        </a>
+        <button class="menu-boton" aria-expanded="false" aria-controls="menu-principal">
+          Menú
+        </button>
+        <nav id="menu-principal" class="menu" aria-label="Principal">
+          {menu.map((i) => <a href={i.href}>{i.texto}</a>)}
+        </nav>
+      </div>
+    </header>
+
+    <main id="contenido">
+      <slot />
+    </main>
+
+    <footer class="pie">
+      <div class="envoltorio pie__rejilla">
+        <div>
+          <p class="pie__titular expandida">¿Necesita esponjas?</p>
+          <p class="pie__texto">
+            Atendemos pedidos de particulares, talleres y distribuidores.
+            Escriba por WhatsApp y le respondemos.
+          </p>
+          <a class="boton" href={WHATSAPP}>Escribir por WhatsApp</a>
+        </div>
+        <div>
+          <h2 class="pie__epigrafe">Páginas</h2>
+          <ul class="pie__lista">
+            {menu.map((i) => <li><a href={i.href}>{i.texto}</a></li>)}
+            <li><a href="/lopd/">Protección de datos</a></li>
+          </ul>
+        </div>
+        <div>
+          <h2 class="pie__epigrafe">Síganos</h2>
+          <ul class="pie__lista">
+            <li><a href="https://www.facebook.com/esponjamicromagic/">Facebook</a></li>
+            <li><a href="https://twitter.com/EsponMicromagic">Twitter</a></li>
+            <li>
+              <a href="https://www.youtube.com/channel/UCi3Sfcmnlnb_EsaTeiuR2NQ/videos">YouTube</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="envoltorio pie__legal">
+        <p>MICROMAGIC — la auténtica esponja mágica, fabricada en España.</p>
+      </div>
+    </footer>
+
+    <style>
+      .cabecera {
+        border-bottom: 1px solid var(--espuma);
+        position: sticky;
+        top: 0;
+        background: var(--panel);
+        z-index: 20;
+      }
+      .cabecera__fila {
+        display: flex;
+        align-items: baseline;
+        gap: 1.5rem;
+        padding: 0.85rem 0;
+        flex-wrap: wrap;
+      }
+      .marca {
+        text-decoration: none;
+        color: var(--tinta);
+        display: flex;
+        align-items: baseline;
+        gap: 0.55rem;
+        margin-right: auto;
+      }
+      .marca__nombre {
+        font-variation-settings: 'wdth' 118, 'wght' 800;
+        font-size: var(--t-1);
+        letter-spacing: 0.01em;
+      }
+      .marca__desde {
+        font-size: var(--t--1);
+        color: var(--espuma-sombra);
+      }
+      .menu {
+        display: flex;
+        gap: 1.15rem;
+        flex-wrap: wrap;
+      }
+      .menu a {
+        color: var(--tinta);
+        text-decoration: none;
+        font-size: var(--t--1);
+        padding-bottom: 2px;
+        border-bottom: 2px solid transparent;
+      }
+      .menu a:hover { border-bottom-color: var(--marca); }
+
+      .menu-boton {
+        display: none;
+        font: inherit;
+        font-size: var(--t--1);
+        background: none;
+        border: 1px solid var(--espuma);
+        color: var(--tinta);
+        padding: 0.35rem 0.8rem;
+        cursor: pointer;
+      }
+
+      @media (max-width: 47rem) {
+        .menu-boton { display: block; }
+        .menu {
+          flex-basis: 100%;
+          flex-direction: column;
+          gap: 0.15rem;
+          display: none;
+          padding-bottom: 0.6rem;
+        }
+        .menu.abierto { display: flex; }
+        .menu a { padding: 0.45rem 0; }
+      }
+
+      .boton {
+        display: inline-block;
+        background: var(--tinta);
+        color: var(--panel);
+        text-decoration: none;
+        padding: 0.8rem 1.4rem;
+        font-variation-settings: 'wdth' 105, 'wght' 700;
+        border: 2px solid var(--tinta);
+      }
+      .boton:hover { background: transparent; color: var(--tinta); }
+
+      .pie {
+        border-top: 3px solid var(--tinta);
+        margin-top: calc(var(--hueco) * 2);
+        padding-top: var(--hueco);
+      }
+      .pie__rejilla {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: var(--hueco);
+      }
+      @media (max-width: 47rem) {
+        .pie__rejilla { grid-template-columns: 1fr; }
+      }
+      .pie__titular { font-size: var(--t-3); margin-bottom: 0.3em; }
+      .pie__texto { color: var(--espuma-sombra); margin-bottom: 1.2em; }
+      .pie__epigrafe {
+        font-size: var(--t-0);
+        font-variation-settings: 'wdth' 100, 'wght' 700;
+        margin-bottom: 0.5em;
+      }
+      .pie__lista { list-style: none; padding: 0; margin: 0; }
+      .pie__lista li { margin-bottom: 0.3em; }
+      .pie__lista a { color: var(--tinta); }
+      .pie__legal {
+        border-top: 1px solid var(--espuma);
+        margin-top: var(--hueco);
+        padding: 1rem 0 2rem;
+        color: var(--espuma-sombra);
+        font-size: var(--t--1);
+      }
+      .pie__legal p { margin: 0; }
+    </style>
+
+    <script>
+      const boton = document.querySelector('.menu-boton');
+      const menu = document.getElementById('menu-principal');
+      boton?.addEventListener('click', () => {
+        const abierto = menu?.classList.toggle('abierto') ?? false;
+        boton.setAttribute('aria-expanded', String(abierto));
+      });
+    </script>
+  </body>
+</html>

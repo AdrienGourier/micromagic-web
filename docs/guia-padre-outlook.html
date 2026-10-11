@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Conectar tu Outlook al correo nuevo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  /* Pensado para imprimir en A4 y para leerse en pantalla sin gafas. */
+  @page { size: A4; margin: 18mm 16mm 16mm; }
+
+  :root{
+    --tinta:#111;
+    --suave:#555;
+    --linea:#bbb;
+    --caja:#f2f2ef;
+    --aviso:#b3301c;
+    --bien:#15682f;
+    --azul:#14538c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:#fff; color:var(--tinta);
+    font-family:Archivo,system-ui,-apple-system,'Helvetica Neue',sans-serif;
+    font-size:12.5pt; line-height:1.55;
+  }
+  .hoja{max-width:180mm; margin-inline:auto; padding:0}
+
+  h1{font-variation-settings:'wdth' 112,'wght' 800; font-size:26pt; line-height:1.08;
+     margin:0 0 .3em; letter-spacing:-.01em}
+  h2{font-variation-settings:'wdth' 108,'wght' 700; font-size:16pt; margin:0 0 .35em; line-height:1.15}
+  h3{font-variation-settings:'wdth' 100,'wght' 700; font-size:12.5pt; margin:1.1em 0 .3em}
+  p{margin:0 0 .75em; max-width:62ch}
+
+  .intro{font-size:13.5pt; color:var(--suave); max-width:55ch}
+
+  .seccion{page-break-before:always; padding-top:0}
+
+  .etiqueta{display:inline-block; font-size:9.5pt; font-variation-settings:'wdth' 100,'wght' 700;
+            letter-spacing:.04em; border:1.5px solid var(--tinta); padding:2px 8px; margin-bottom:.6em}
+
+  ol.pasos{counter-reset:p; list-style:none; padding:0; margin:1em 0}
+  ol.pasos > li{counter-increment:p; position:relative; padding-left:13mm; margin-bottom:1em;
+                page-break-inside:avoid}
+  ol.pasos > li::before{
+    content:counter(p); position:absolute; left:0; top:-1px;
+    width:9mm; height:9mm; border-radius:50%; background:var(--tinta); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11pt; font-variation-settings:'wdth' 100,'wght' 800;
+  }
+  ol.pasos strong{font-variation-settings:'wdth' 100,'wght' 700}
+
+  .aviso{border:2px solid var(--aviso); padding:.7em .9em; margin:1em 0; page-break-inside:avoid}
+  .aviso strong{color:var(--aviso)}
+  .tranquilo{border:2px solid var(--bien); padding:.7em .9em; margin:1em 0; page-break-inside:avoid}
+  .tranquilo strong{color:var(--bien)}
+
+  .bifurca{display:grid; grid-template-columns:1fr 1fr; gap:6mm; margin:1.2em 0}
+  .opcion{border:2px solid var(--linea); padding:.8em .9em}
+  .opcion h3{margin-top:0}
+  .opcion p{font-size:11.5pt; margin-bottom:.4em}
+  .opcion .vas{font-variation-settings:'wdth' 100,'wght' 800; color:var(--azul); font-size:11.5pt}
+
+  /* La ficha con los datos del servidor: lo que hay que copiar, grande. */
+  table.ficha{border-collapse:collapse; width:100%; margin:.8em 0 1em; font-size:11.5pt;
+              page-break-inside:avoid}
+  table.ficha th,table.ficha td{border:1.5px solid var(--tinta); padding:6px 8px; text-align:left;
+                                vertical-align:top}
+  table.ficha th{background:var(--caja); font-variation-settings:'wdth' 100,'wght' 700;
+                 font-size:10.5pt; width:34%}
+  table.ficha td code{font-family:ui-monospace,Menlo,monospace; font-size:12pt;
+                      font-weight:700}
+  table.ficha .seccion-fila th{background:var(--tinta); color:#fff; width:auto}
+
+  table.cuentas{border-collapse:collapse; width:100%; margin:.8em 0; font-size:11.5pt}
+  table.cuentas th,table.cuentas td{border:1.5px solid var(--tinta); padding:7px 8px; text-align:left}
+  table.cuentas th{background:var(--caja); font-variation-settings:'wdth' 100,'wght' 700; font-size:10.5pt}
+  table.cuentas td{height:11mm}
+  table.cuentas td.dir{font-family:ui-monospace,Menlo,monospace; font-size:11pt; width:46%}
+  table.cuentas td.marca{width:14%; text-align:center; font-size:14pt}
+
+  .nota{color:var(--suave); font-size:11pt}
+  .firma{margin-top:2em; padding-top:.8em; border-top:1.5px solid var(--linea); color:var(--suave); font-size:11pt}
+
+  @media screen{
+    body{background:#eceae5; padding:10mm 4mm}
+    .hoja{background:#fff; max-width:200mm; padding:14mm; box-shadow:0 2px 18px rgba(0,0,0,.12)}
+    .seccion{page-break-before:auto; border-top:1px dashed var(--linea); margin-top:10mm; padding-top:8mm}
+    .seccion:first-of-type{border-top:0; margin-top:0}
+  }
+</style>
+</head>
+<body>
+<div class="hoja">
+
+  <h1>Conectar tu Outlook<br>al correo nuevo</h1>
+  <p class="intro">
+    Papá, desde el 7 de octubre el correo de la empresa ya no llega a IONOS, llega
+    a un sitio nuevo. Por eso tu Outlook no te enseña los correos nuevos: está
+    mirando el buzón viejo, que ya no recibe nada.
+  </p>
+
+  <div class="tranquilo">
+    <strong>No se ha perdido ningún correo.</strong>
+    Todo lo que te han mandado está guardado en el buzón nuevo, y además te llega
+    una copia a <b>jlmgourier@hotmail.com</b>. Mientras haces esto, puedes mirar
+    ahí.
+  </div>
+
+  <h3>Lo que vas a hacer</h3>
+  <p>
+    <strong>No vas a cerrar ni a borrar tu cuenta de siempre.</strong> Vas a
+    <em>añadir</em> una cuenta nueva al Outlook, con la misma dirección. Durante
+    unos días tendrás las dos, una debajo de la otra:
+  </p>
+  <ol class="pasos">
+    <li><strong>La nueva</strong> es la que recibe los correos de ahora.
+        Al principio estará casi vacía.</li>
+    <li><strong>La de siempre</strong> guarda tus correos de años. No la toques:
+        yo pasaré esos correos a la nueva en unos días. Cuando esté hecho, te diré
+        cómo quitar la vieja (está en la última hoja).</li>
+  </ol>
+
+  <h3>Antes de empezar, necesitas</h3>
+  <p>La <strong>contraseña nueva</strong> de cada dirección. Te la doy yo. No es
+     la de antes: la de IONOS ya no sirve aquí.</p>
+
+  <table class="cuentas">
+    <tr><th>Dirección</th><th>Contraseña nueva (te la doy yo)</th><th>Hecha</th></tr>
+    <tr><td class="dir">administracion@micromagic.tv</td><td></td><td class="marca">☐</td></tr>
+    <tr><td class="dir">director@micromagic.tv</td><td></td><td class="marca">☐</td></tr>
+    <tr><td class="dir">info@rhinopaint.es</td><td></td><td class="marca">☐</td></tr>
+  </table>
+  <p class="nota">Haz solo las direcciones que uses. Los pasos son iguales para las tres:
+     haces una entera y luego repites con la siguiente.</p>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <section class="seccion">
+    <span class="etiqueta">PRIMERO</span>
+    <h2>¿Qué Outlook tienes?</h2>
+    <p>Hay dos Outlook y se hacen distinto. Abre Outlook y pulsa
+       <strong>Archivo</strong>, arriba a la izquierda. Mira qué aparece:</p>
+
+    <div class="bifurca">
+      <div class="opcion">
+        <h3>Una pantalla grande</h3>
+        <p>Toda la ventana cambia de color. Arriba pone <strong>Información de la
+           cuenta</strong> y hay un botón <strong>+ Agregar cuenta</strong>.</p>
+        <p class="vas">→ Es el Outlook clásico.<br>Sigue en la hoja A.</p>
+      </div>
+      <div class="opcion">
+        <h3>Un menú pequeño, o no hay «Archivo»</h3>
+        <p>Sale una lista corta con <strong>Información de la cuenta</strong>, o
+           no existe la pestaña Archivo y arriba a la derecha hay una
+           <strong>rueda dentada ⚙</strong>.</p>
+        <p class="vas">→ Es el Outlook nuevo.<br>Sáltate la hoja A y ve a la hoja B.</p>
+      </div>
+    </div>
+
+    <h3>Los datos que te pedirá</h3>
+    <p>Los dos Outlook pueden pedirte esto. Tenlo a mano:</p>
+    <table class="ficha">
+      <tr><th>Tipo de cuenta</th><td><code>IMAP</code></td></tr>
+      <tr class="seccion-fila"><th colspan="2">Correo entrante</th></tr>
+      <tr><th>Servidor</th><td><code>imap.forwardemail.net</code></td></tr>
+      <tr><th>Puerto</th><td><code>993</code></td></tr>
+      <tr><th>Cifrado</th><td><code>SSL/TLS</code></td></tr>
+      <tr class="seccion-fila"><th colspan="2">Correo saliente</th></tr>
+      <tr><th>Servidor</th><td><code>smtp.forwardemail.net</code></td></tr>
+      <tr><th>Puerto</th><td><code>465</code></td></tr>
+      <tr><th>Cifrado</th><td><code>SSL/TLS</code></td></tr>
+      <tr class="seccion-fila"><th colspan="2">Tus datos</th></tr>
+      <tr><th>Usuario</th><td>la dirección entera, por ejemplo <code>info@rhinopaint.es</code></td></tr>
+      <tr><th>Contraseña</th><td>la nueva, la de la tabla de la primera hoja</td></tr>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <section class="seccion">
+    <span class="etiqueta">HOJA A · OUTLOOK CLÁSICO</span>
+    <h2>Añadir la cuenta nueva</h2>
+    <ol class="pasos">
+      <li>Pulsa <strong>Archivo</strong> y luego <strong>+ Agregar cuenta</strong>.</li>
+      <li>Escribe la dirección, por ejemplo <b>administracion@micromagic.tv</b>.
+          <strong>No pulses Conectar todavía.</strong></li>
+      <li>Justo debajo, pulsa <strong>Opciones avanzadas</strong> y marca la
+          casilla <strong>Permíteme configurar mi cuenta manualmente</strong>.
+          Ahora sí, pulsa <strong>Conectar</strong>.</li>
+      <li>Te enseña varios iconos. Elige <strong>IMAP</strong>.
+          No elijas POP ni Microsoft 365.</li>
+      <li>Sale la pantalla <strong>Configuración de la cuenta IMAP</strong>.
+          Rellena con los datos de la ficha:
+          <br>· <strong>Correo entrante</strong>: <b>imap.forwardemail.net</b>,
+          puerto <b>993</b>, cifrado <b>SSL/TLS</b>
+          <br>· <strong>Correo saliente</strong>: <b>smtp.forwardemail.net</b>,
+          puerto <b>465</b>, cifrado <b>SSL/TLS</b>
+          <br>Deja <strong>sin marcar</strong> la casilla que habla de «SPA».
+          Pulsa <strong>Siguiente</strong>.</li>
+      <li>Escribe la <strong>contraseña nueva</strong> y pulsa
+          <strong>Conectar</strong>.</li>
+      <li>Si dice que la cuenta se ha agregado correctamente, pulsa
+          <strong>Listo</strong>. Si pregunta por el móvil u otras cuentas, no
+          hace falta: termina.</li>
+    </ol>
+    <p>La cuenta nueva aparece en la columna de la izquierda, debajo de la
+       vieja. Repite los pasos con la siguiente dirección.</p>
+
+    <div class="aviso">
+      <strong>Si pone que la contraseña no es correcta:</strong> revisa que sea la
+      <em>nueva</em>, sin espacios al principio ni al final. Si sigue fallando,
+      pulsa Cancelar y llámame. No pasa nada: tu cuenta de siempre sigue igual.
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <section class="seccion">
+    <span class="etiqueta">HOJA B · OUTLOOK NUEVO</span>
+    <h2>Añadir la cuenta nueva</h2>
+    <ol class="pasos">
+      <li>Abre los ajustes: pulsa la <strong>rueda dentada ⚙</strong> arriba a la
+          derecha. Si no la ves, pulsa <strong>Archivo</strong> y luego
+          <strong>Información de la cuenta</strong>.</li>
+      <li>En la ventana que se abre, pulsa <strong>Cuentas</strong> y luego
+          <strong>Sus cuentas</strong>.</li>
+      <li>En <strong>Cuentas de correo electrónico</strong>, pulsa
+          <strong>Agregar cuenta</strong>.</li>
+      <li>Escribe la dirección, por ejemplo <b>administracion@micromagic.tv</b>,
+          y pulsa <strong>Continuar</strong>.</li>
+      <li>Si te pregunta qué tipo de cuenta es, elige <strong>IMAP</strong>.
+          Si te pide los servidores, copia los de la ficha: entrante
+          <b>imap.forwardemail.net</b> 993 SSL/TLS, saliente
+          <b>smtp.forwardemail.net</b> 465 SSL/TLS, y en usuario la dirección
+          entera.</li>
+      <li>Escribe la <strong>contraseña nueva</strong> y pulsa
+          <strong>Continuar</strong> o <strong>Listo</strong>.</li>
+      <li>Si te avisa de que va a <strong>sincronizar la cuenta con la nube de
+          Microsoft</strong>, acepta. Es normal en este Outlook.</li>
+    </ol>
+    <p>La cuenta nueva aparece en la columna de la izquierda. Repite con la
+       siguiente dirección.</p>
+
+    <p class="nota">
+      Las pantallas de este Outlook cambian a menudo. Si algún nombre no es igual
+      que aquí, busca el que se le parezca. Si te atascas, cierra la ventana: no
+      se ha cambiado nada y me llamas.
+    </p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <section class="seccion">
+    <span class="etiqueta">AL TERMINAR</span>
+    <h2>Comprobar que funciona</h2>
+    <ol class="pasos">
+      <li>Pide a alguien que te mande un correo a esa dirección, o mándatelo tú
+          desde el móvil.</li>
+      <li>Tiene que aparecer en la <strong>cuenta nueva</strong> en un par de
+          minutos. En la vieja no saldrá: es normal.</li>
+    </ol>
+
+    <h3>Para contestar correos</h3>
+    <p>Contesta desde la <strong>cuenta nueva</strong>. Si al enviar te sale un
+       error, contesta esa vez desde la <strong>cuenta de siempre</strong>, que
+       todavía envía bien, y avísame.</p>
+
+    <div class="aviso">
+      <strong>Lo que no tienes que hacer todavía:</strong>
+      <br>· No quites la cuenta de siempre. Tiene tus correos de años.
+      <br>· No elijas POP en lugar de IMAP.
+      <br>· No uses la contraseña antigua en la cuenta nueva.
+    </div>
+
+    <h3>Más adelante, solo cuando yo te lo diga</h3>
+    <p>Cuando haya pasado tus correos viejos a la cuenta nueva, quitas la vieja.
+       Así no verás cada cuenta dos veces:</p>
+    <p><strong>Outlook clásico:</strong> Archivo → Configuración de la cuenta →
+       Configuración de la cuenta → eliges la cuenta <em>vieja</em> →
+       <strong>Quitar</strong> → Sí.</p>
+    <p><strong>Outlook nuevo:</strong> ⚙ → Cuentas → Sus cuentas →
+       <strong>Administrar</strong> en la cuenta <em>vieja</em> →
+       <strong>Quitar</strong>, y elige quitarla solo de este dispositivo.</p>
+    <p class="nota">Ojo: las dos cuentas tienen el mismo nombre. La vieja es la que
+       ya tenías, la que no recibe correos nuevos. Si dudas, no quites ninguna y
+       me llamas.</p>
+
+    <p class="firma">Cualquier cosa, llámame. — Adrien</p>
+  </section>
+
+</div>
+</body>
+</html>
