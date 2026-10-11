@@ -35,6 +35,10 @@
 #   ./scripts/subir-correo.sh --mostrar-config       la configuración, sin conectar
 #
 # Se puede cortar y relanzar: mbsync guarda por dónde iba.
+#
+# AuthMechs PLAIN es obligatorio: forwardemail anuncia también PLAIN-CLIENTTOKEN,
+# mbsync lo prefiere, y el plugin SASL de macOS que lo implementa falla con
+# «SASL(-7): invalid parameter supplied». IONOS no lo anuncia.
 
 set -uo pipefail
 
@@ -136,6 +140,7 @@ Port 993
 User $direccion
 Pass $(cita "$clave")
 TLSType IMAPS
+AuthMechs PLAIN
 PipelineDepth 1
 
 IMAPStore $canal-forwardemail
