@@ -15,8 +15,9 @@
 #
 # subir-correo.sh no arranca mientras quede algún hueco.
 
-Elementos enviados=<la carpeta marcada \Sent en el paso 1>
-Borradores=<la carpeta marcada \Drafts en el paso 1>
+# Comprobado el 11 oct en los tres buzones con verificar-correo.py --solo-servidor.
+Elementos enviados=Sent Mail
+Borradores=Drafts
 
 # Carpeta normal a propósito, no la papelera de forwardemail: esa se vacía
 # sola, y en administracion@ la Papelera guarda casi todo el correo de junio a
