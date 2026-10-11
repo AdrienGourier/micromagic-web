@@ -81,6 +81,10 @@
   table.cuentas td.marca{width:14%; text-align:center; font-size:14pt}
 
   .nota{color:var(--suave); font-size:11pt}
+  /* La última hoja va justa: algo más prieta para que quepa en una página. */
+  .prieta{font-size:12pt}
+  .prieta ol.pasos > li{margin-bottom:.55em}
+  .prieta .firma{margin-top:1em}
   .firma{margin-top:2em; padding-top:.8em; border-top:1.5px solid var(--linea); color:var(--suave); font-size:11pt}
 
   @media screen{
@@ -169,7 +173,10 @@
       <tr class="seccion-fila"><th colspan="2">Correo saliente</th></tr>
       <tr><th>Servidor</th><td><code>smtp.forwardemail.net</code></td></tr>
       <tr><th>Puerto</th><td><code>465</code></td></tr>
-      <tr><th>Cifrado</th><td><code>SSL/TLS</code></td></tr>
+      <tr><th>Cifrado</th><td><code>SSL/TLS</code>
+        <br><span class="nota">También vale puerto <code>587</code> con cifrado
+        <code>STARTTLS</code>. Pero van en pareja: 465 con SSL/TLS, o 587 con
+        STARTTLS. Mezclados, Outlook da error al enviar.</span></td></tr>
       <tr class="seccion-fila"><th colspan="2">Tus datos</th></tr>
       <tr><th>Usuario</th><td>la dirección entera, por ejemplo <code>info@rhinopaint.es</code></td></tr>
       <tr><th>Contraseña</th><td>la nueva, la de la tabla de la primera hoja</td></tr>
@@ -272,16 +279,67 @@
 
     <h3>Más adelante, solo cuando yo te lo diga</h3>
     <p>Cuando haya pasado tus correos viejos a la cuenta nueva, quitas la vieja.
-       Así no verás cada cuenta dos veces:</p>
-    <p><strong>Outlook clásico:</strong> Archivo → Configuración de la cuenta →
-       Configuración de la cuenta → eliges la cuenta <em>vieja</em> →
-       <strong>Quitar</strong> → Sí.</p>
-    <p><strong>Outlook nuevo:</strong> ⚙ → Cuentas → Sus cuentas →
-       <strong>Administrar</strong> en la cuenta <em>vieja</em> →
-       <strong>Quitar</strong>, y elige quitarla solo de este dispositivo.</p>
-    <p class="nota">Ojo: las dos cuentas tienen el mismo nombre. La vieja es la que
-       ya tenías, la que no recibe correos nuevos. Si dudas, no quites ninguna y
-       me llamas.</p>
+       Está en la hoja siguiente.</p>
+
+    <p class="firma">Cualquier cosa, llámame. — Adrien</p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <section class="seccion prieta">
+    <span class="etiqueta">ÚLTIMA HOJA · CUANDO YO TE LO DIGA</span>
+    <h2>Quitar la cuenta vieja</h2>
+    <div class="tranquilo">
+      <strong>Tus correos de siempre ya están en la cuenta nueva,</strong> cada
+      uno con su fecha. La papelera vieja está en la carpeta <b>Papelera IONOS</b>.
+    </div>
+
+    <h3>Outlook clásico (hoja A)</h3>
+    <ol class="pasos">
+      <li><strong>Copia de seguridad.</strong> Archivo → <strong>Abrir y
+          exportar</strong> → <strong>Importar o exportar</strong> → elige
+          <strong>Exportar a un archivo</strong> → Siguiente →
+          <strong>Archivo de datos de Outlook (.pst)</strong> → Siguiente. Pulsa
+          la cuenta <em>vieja</em>, marca <strong>Incluir subcarpetas</strong>,
+          Siguiente, y guárdalo en el Escritorio. Si te pide una contraseña para
+          el archivo, déjala en blanco y pulsa Aceptar.</li>
+      <li><strong>La nueva, la principal.</strong> Archivo →
+          <strong>Configuración de la cuenta</strong> → <strong>Configuración de
+          la cuenta</strong>. En la pestaña Correo electrónico, pulsa la cuenta
+          <em>nueva</em> y luego <strong>Establecer como predeterminado</strong>.
+          <br><span class="nota">¿Cuál es cuál? Pulsa una y luego
+          <strong>Cambiar</strong>: si en el servidor pone
+          <b>imap.forwardemail.net</b> es la nueva; si pone <b>imap.ionos.es</b>
+          es la vieja. Sal con Cancelar. Si dudas, no quites ninguna y me
+          llamas.</span></li>
+      <li><strong>Tu firma.</strong> Archivo → <strong>Opciones</strong> →
+          <strong>Correo</strong> → <strong>Firmas</strong>. En <strong>Cuenta de
+          correo electrónico</strong> elige la nueva y pon tu firma en
+          <strong>Mensajes nuevos</strong> y en <strong>Respuestas o
+          reenvíos</strong>.</li>
+      <li><strong>Quitar.</strong> En la misma ventana del paso 2, pulsa la
+          cuenta <em>vieja</em> → <strong>Quitar</strong> → Sí.</li>
+      <li><strong>Mira tus contactos y tu calendario.</strong> Si falta algo, no
+          hagas nada más y llámame: está todo en la copia del paso 1.</li>
+    </ol>
+
+    <h3>Outlook nuevo (hoja B)</h3>
+    <ol class="pasos">
+      <li>Abre <strong>Personas</strong> y <strong>Calendario</strong> y mira que
+          tus contactos y tus citas estén ahí. Hazle una foto con el móvil a lo
+          que no quieras perder.</li>
+      <li>⚙ → <strong>Cuentas</strong> → <strong>Sus cuentas</strong> →
+          <strong>Administrar</strong> en la cuenta <em>vieja</em> →
+          <strong>Quitar</strong>, <strong>solo de este dispositivo</strong>.
+          Vuelve a mirar Personas y Calendario: si falta algo, llámame.</li>
+    </ol>
+
+    <div class="aviso">
+      <strong>Nunca pidas una contraseña nueva para una dirección que ya
+      funciona.</strong> En el sitio nuevo, cada buzón va cerrado con su
+      contraseña: si se cambia sin la de antes, se pueden borrar todos los correos
+      de ese buzón. Si un día Outlook dice que la contraseña no es correcta, no
+      toques nada y llámame.
+    </div>
 
     <p class="firma">Cualquier cosa, llámame. — Adrien</p>
   </section>
