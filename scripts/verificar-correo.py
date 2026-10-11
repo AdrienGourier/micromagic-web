@@ -10,6 +10,14 @@ De paso saca dos fechas que dicen cómo se usa cada buzón:
     descarga por POP3 y borra del servidor, y el histórico está en el PC
   - el último enviado: qué direcciones se usan de verdad para escribir
 
+Con --solo-servidor enseña además los flags SPECIAL-USE (\\Sent, \\Drafts…):
+así se sabe cómo llama forwardemail a sus carpetas especiales para rellenar
+mapa-carpetas.txt.
+
+Con --mapa comprueba una SUBIDA: cada correo de cada carpeta local tiene que
+estar en su carpeta de destino del servidor, cotejado por Message-ID. Contar
+no basta: el correo nuevo que entra en INBOX taparía los huecos de lo subido.
+
 Mismo fichero de credenciales que rescatar-correo.sh (chmod 600):
   direccion:contraseña
 
@@ -18,64 +26,17 @@ Uso:
   python3 scripts/verificar-correo.py <carpeta>            ese rescate
   python3 scripts/verificar-correo.py --solo-servidor      sin comparar con local
   python3 scripts/verificar-correo.py --servidor imap.forwardemail.net \\
-      --creds ~/.forwardemail-correo --solo-servidor       lo subido a forwardemail
+      --creds ~/.forwardemail-correo --solo-servidor       qué hay en forwardemail
+  python3 scripts/verificar-correo.py --servidor imap.forwardemail.net \\
+      --creds ~/.forwardemail-correo --mapa scripts/mapa-carpetas.txt
+                                                           cotejo de la subida
 Sale con 1 si falta algo o falla un login.
 """
-import argparse, base64, imaplib, re, sys, time
+import argparse, imaplib, sys, time
 from pathlib import Path
 
-LISTA = re.compile(rb'\((?P<flags>[^)]*)\) (?P<sep>"[^"]*"|NIL) (?P<nombre>.+)')
-
-
-def leer_creds(ruta: Path) -> list[tuple[str, str]]:
-    if not ruta.is_file():
-        sys.exit(f"No encuentro {ruta}.")
-    if ruta.stat().st_mode & 0o777 != 0o600:
-        sys.exit(f"AVISO: {ruta} no tiene permisos 600. Corrígelo:  chmod 600 {ruta}")
-    cuentas = []
-    for linea in ruta.read_text().splitlines():
-        if not linea or linea.startswith("#") or ":" not in linea:
-            continue
-        direccion, clave = linea.split(":", 1)   # la contraseña puede llevar ':'
-        cuentas.append((direccion, clave))
-    return cuentas
-
-
-def utf7_imap(nombre: str) -> str:
-    """Los nombres de carpeta IMAP no ASCII van en UTF-7 modificado (RFC 3501)."""
-    def tramo(m: re.Match) -> str:
-        if m.group(1) == "":
-            return "&"
-        b64 = m.group(1).replace(",", "/")
-        return base64.b64decode(b64 + "=" * (-len(b64) % 4)).decode("utf-16-be")
-    return re.sub(r"&([^-]*)-", tramo, nombre)
-
-
-def carpetas(imap: imaplib.IMAP4_SSL) -> list[tuple[str, str, str]]:
-    """(nombre en el servidor, separador, flags) de cada carpeta seleccionable."""
-    _, filas = imap.list()
-    salida = []
-    for fila in filas:
-        m = LISTA.match(fila if isinstance(fila, bytes) else b"")
-        if not m:
-            continue
-        flags = m["flags"].decode()
-        if "\\Noselect" in flags or "\\NonExistent" in flags:
-            continue
-        nombre = m["nombre"].decode()
-        if nombre.startswith('"'):
-            nombre = nombre[1:-1].replace('\\"', '"').replace("\\\\", "\\")
-        sep = m["sep"].decode().strip('"') if m["sep"] != b"NIL" else ""
-        salida.append((nombre, sep, flags))
-    return salida
-
-
-def examinar(imap: imaplib.IMAP4_SSL, nombre: str) -> int:
-    cita = '"' + nombre.replace("\\", "\\\\").replace('"', '\\"') + '"'
-    estado, datos = imap.select(cita, readonly=True)
-    if estado != "OK":
-        raise imaplib.IMAP4.error(f"no se puede abrir {nombre}")
-    return int(datos[0])
+from correo_imap import (carpetas, cabeceras_de, especiales, examinar, id_mensaje,
+                         ids_servidor, leer_creds, leer_mapa, legible, utf7_imap)
 
 
 def fechas(imap: imaplib.IMAP4_SSL) -> tuple[str, str]:
@@ -91,9 +52,13 @@ def fechas(imap: imaplib.IMAP4_SSL) -> tuple[str, str]:
     return (dias[0], dias[-1]) if dias else ("?", "?")
 
 
+def ficheros(carpeta: Path) -> list[Path]:
+    return [f for sub in ("cur", "new") if (carpeta / sub).is_dir()
+            for f in (carpeta / sub).iterdir() if f.is_file()]
+
+
 def locales(carpeta: Path) -> int:
-    return sum(1 for sub in ("cur", "new") if (carpeta / sub).is_dir()
-               for f in (carpeta / sub).iterdir() if f.is_file())
+    return len(ficheros(carpeta))
 
 
 def maildir(base: Path, nombre: str, sep: str) -> Path:
@@ -105,13 +70,123 @@ def maildir(base: Path, nombre: str, sep: str) -> Path:
     return base.joinpath(*(nombre.split(sep) if sep else [nombre]))
 
 
+def carpetas_locales(buzon: Path) -> list[tuple[str, Path]]:
+    """(nombre con '/', ruta) de cada carpeta Maildir del rescate de un buzón."""
+    salida = []
+    for d in sorted([buzon, *buzon.rglob("*")]):
+        if d.is_dir() and (d / "cur").is_dir():
+            salida.append((d.relative_to(buzon).as_posix(), d))
+    return salida
+
+
+def contar(imap, direccion, origen, problemas) -> int:
+    """El modo de siempre: cuántos hay en cada carpeta, servidor contra local."""
+    mas_antiguo = ultimo_enviado = "-"
+    total_srv = total_loc = 0
+    for nombre, sep, flags in carpetas(imap):
+        try:
+            n_srv = examinar(imap, nombre)
+        except imaplib.IMAP4.error as e:
+            print(f"  {utf7_imap(nombre):<28} ERROR: {e}")
+            problemas += 1
+            continue
+        if nombre.upper() == "INBOX" and n_srv:
+            mas_antiguo = fechas(imap)[0]
+        enviados = "\\Sent" in flags or nombre.lower() in ("elementos enviados", "sent")
+        if enviados and n_srv:
+            ultimo_enviado = fechas(imap)[1]
+        total_srv += n_srv
+
+        if origen is None:
+            marca = " ".join(especiales(flags))
+            print(f"  {utf7_imap(nombre):<28} {n_srv:>6}" + (f"   {marca}" if marca else ""))
+            continue
+        n_loc = locales(maildir(origen / direccion, nombre, sep))
+        total_loc += n_loc
+        # Más en local que en el servidor es normal: Expunge None no borra lo
+        # que el servidor haya borrado después del rescate.
+        veredicto = "OK" if n_loc >= n_srv else f"FALTAN {n_srv - n_loc}"
+        if n_loc < n_srv:
+            problemas += 1
+        print(f"  {utf7_imap(nombre):<28} servidor {n_srv:>6}   local {n_loc:>6}   {veredicto}")
+
+    resumen = f"  total servidor {total_srv}"
+    if origen is not None:
+        resumen += f"   local {total_loc}"
+    print(resumen)
+    print(f"  correo más antiguo en la bandeja: {mas_antiguo}")
+    print(f"  último enviado:                   {ultimo_enviado}\n")
+    return problemas
+
+
+def cotejar(imap, direccion, origen, mapa, problemas) -> int:
+    """La subida: cada correo local tiene que estar en su carpeta de destino."""
+    buzon = origen / direccion
+    if not buzon.is_dir():
+        print(f"  no hay rescate de este buzón en {origen}\n")
+        return problemas
+    en_servidor = {legible(n, s): n for n, s, _ in carpetas(imap)}
+
+    for nombre_local, ruta in carpetas_locales(buzon):
+        destino = mapa.get(nombre_local, nombre_local)
+        etiqueta = f"{nombre_local:<22} → {destino or '-':<18}"
+        if destino == "":
+            print(f"  {nombre_local:<22}   no se sube (mapa)")
+            continue
+
+        locales_ids, sin_id_local = {}, 0
+        archivos = ficheros(ruta)
+        for f in archivos:
+            with open(f, "rb") as fh:
+                mid, asunto = id_mensaje(cabeceras_de(fh.read(256 * 1024)))
+            if mid:
+                locales_ids.setdefault(mid, asunto)
+            else:
+                sin_id_local += 1
+
+        real = en_servidor.get(destino) or next(
+            (v for k, v in en_servidor.items() if k.upper() == destino.upper() == "INBOX"), None)
+        if real is None:
+            print(f"  {etiqueta} NO EXISTE EN EL SERVIDOR ({len(archivos)} correos sin subir)")
+            problemas += 1
+            continue
+
+        total = examinar(imap, real)
+        servidor = ids_servidor(imap, total) if total else []
+        ids_srv = {mid for mid, _ in servidor if mid}
+        sin_id_srv = sum(1 for mid, _ in servidor if not mid)
+        faltan = [mid for mid in locales_ids if mid not in ids_srv]
+
+        # «local» son ficheros: un correo guardado dos veces cuenta dos, pero
+        # en el cotejo por Message-ID basta con que esté una.
+        linea = f"  {etiqueta} local {len(archivos):>6}   servidor {total:>6}   "
+        if faltan:
+            problemas += 1
+            print(linea + f"FALTAN {len(faltan)}")
+            for mid in faltan[:5]:
+                print(f"      · {locales_ids[mid][:90] or '(sin asunto)'}")
+        else:
+            print(linea + "OK")
+        # Sin Message-ID no hay forma de emparejar uno a uno: se comparan cuántos.
+        if sin_id_local:
+            aviso = "" if sin_id_srv >= sin_id_local else "   ← en el servidor hay menos"
+            print(f"      {sin_id_local} correo(s) sin Message-ID en local, {sin_id_srv} en el servidor{aviso}")
+            if sin_id_srv < sin_id_local:
+                problemas += 1
+    print()
+    return problemas
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("rescate", nargs="?", help="carpeta ~/Backups/ionos-correo-<fecha>")
     ap.add_argument("--servidor", default="imap.ionos.es")
     ap.add_argument("--creds", default="~/.ionos-correo")
     ap.add_argument("--solo-servidor", action="store_true")
+    ap.add_argument("--mapa", help="mapa-carpetas.txt: coteja la subida por Message-ID")
     args = ap.parse_args()
+    if args.mapa and args.solo_servidor:
+        sys.exit("--mapa compara con el rescate local: no va con --solo-servidor.")
 
     origen = None
     if not args.solo_servidor:
@@ -123,6 +198,7 @@ def main() -> int:
         if not origen or not origen.is_dir():
             sys.exit("No encuentro el rescate. Ejecuta antes ./scripts/rescatar-correo.sh")
         print(f"rescate: {origen}\n")
+    mapa = leer_mapa(Path(args.mapa).expanduser()) if args.mapa else None
 
     problemas = 0
     for direccion, clave in leer_creds(Path(args.creds).expanduser()):
@@ -134,42 +210,11 @@ def main() -> int:
             print(f"  LOGIN FALLIDO: {e}\n")
             problemas += 1
             continue
-
-        mas_antiguo = ultimo_enviado = "-"
-        total_srv = total_loc = 0
-        for nombre, sep, flags in carpetas(imap):
-            try:
-                n_srv = examinar(imap, nombre)
-            except imaplib.IMAP4.error as e:
-                print(f"  {utf7_imap(nombre):<28} ERROR: {e}")
-                problemas += 1
-                continue
-            if nombre.upper() == "INBOX" and n_srv:
-                mas_antiguo = fechas(imap)[0]
-            enviados = "\\Sent" in flags or nombre.lower() in ("elementos enviados", "sent")
-            if enviados and n_srv:
-                ultimo_enviado = fechas(imap)[1]
-            total_srv += n_srv
-
-            if origen is None:
-                print(f"  {utf7_imap(nombre):<28} {n_srv:>6}")
-                continue
-            n_loc = locales(maildir(origen / direccion, nombre, sep))
-            total_loc += n_loc
-            # Más en local que en el servidor es normal: Expunge None no borra lo
-            # que el servidor haya borrado después del rescate.
-            veredicto = "OK" if n_loc >= n_srv else f"FALTAN {n_srv - n_loc}"
-            if n_loc < n_srv:
-                problemas += 1
-            print(f"  {utf7_imap(nombre):<28} servidor {n_srv:>6}   local {n_loc:>6}   {veredicto}")
+        if mapa is not None:
+            problemas = cotejar(imap, direccion, origen, mapa, problemas)
+        else:
+            problemas = contar(imap, direccion, origen, problemas)
         imap.logout()
-
-        resumen = f"  total servidor {total_srv}"
-        if origen is not None:
-            resumen += f"   local {total_loc}"
-        print(resumen)
-        print(f"  correo más antiguo en la bandeja: {mas_antiguo}")
-        print(f"  último enviado:                   {ultimo_enviado}\n")
 
     print("TODO CUADRA" if problemas == 0 else f"PROBLEMAS: {problemas}")
     return 0 if problemas == 0 else 1

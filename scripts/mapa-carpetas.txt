@@ -1,0 +1,27 @@
+# En qué carpeta de forwardemail acaba cada carpeta del rescate de IONOS.
+# Lo leen subir-correo.sh y verificar-correo.py --mapa.
+#
+#   origen=destino    origen:  carpeta del rescate, tal como la dejó mbsync
+#                     destino: carpeta en forwardemail; vacío = no se sube
+#
+# Las carpetas que no aparecen aquí se suben con el mismo nombre: INBOX,
+# INBOX/aver video, INBOX/federico, IMPORTANTE, Notes…
+#
+# Los huecos <…> se rellenan con lo que enseña el paso 1, que marca cada
+# carpeta especial con su flag (\Sent, \Drafts…):
+#
+#   python3 scripts/verificar-correo.py --servidor imap.forwardemail.net \
+#       --creds ~/.forwardemail-correo --solo-servidor
+#
+# subir-correo.sh no arranca mientras quede algún hueco.
+
+Elementos enviados=<la carpeta marcada \Sent en el paso 1>
+Borradores=<la carpeta marcada \Drafts en el paso 1>
+
+# Carpeta normal a propósito, no la papelera de forwardemail: esa se vacía
+# sola, y en administracion@ la Papelera guarda casi todo el correo de junio a
+# agosto (el padre borra lo que lee).
+Papelera=Papelera IONOS
+
+# El spam no se sube.
+Spam=
