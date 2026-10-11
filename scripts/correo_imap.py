@@ -87,6 +87,12 @@ def id_mensaje(cabeceras: bytes) -> tuple[str | None, str]:
     """
     msg = BytesHeaderParser(policy=compat32).parsebytes(cabeceras)
     crudo = msg.get("Message-ID") or msg.get("Message-Id") or ""
+    if not crudo:
+        # Una cabecera rota (una línea suelta sin «:» en medio de un asunto
+        # plegado) hace que el parser deje de leer ahí, y el Message-ID que
+        # viene detrás se pierde. Visto en un boletín de Contasimple.
+        m = re.search(rb"(?mi)^message-id:[ \t]*(.*(?:\r?\n[ \t].*)*)", cabeceras)
+        crudo = m.group(1).decode("latin-1") if m else ""
     mid = re.sub(r"\s+", "", str(crudo)) or None
     asunto = str(msg.get("Subject", "") or "")
     try:
