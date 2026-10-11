@@ -41,8 +41,9 @@
 # «SASL(-7): invalid parameter supplied». IONOS no lo anuncia.
 #
 # Timeout 120: con los 20 s por defecto, forwardemail cortó la primera subida
-# grande a los 1.564 correos (11 oct). Al relanzar no se duplicó nada: mbsync
-# encuentra en el servidor lo que quedó a medias.
+# grande a los 1.564 correos (11 oct). Al relanzar sigue donde iba, pero el
+# correo que estaba subiendo en el corte queda dos veces: el servidor lo había
+# guardado y mbsync no lo reconoce. Cada corte deja un duplicado.
 
 set -uo pipefail
 
