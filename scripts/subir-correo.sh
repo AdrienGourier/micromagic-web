@@ -39,6 +39,10 @@
 # AuthMechs PLAIN es obligatorio: forwardemail anuncia también PLAIN-CLIENTTOKEN,
 # mbsync lo prefiere, y el plugin SASL de macOS que lo implementa falla con
 # «SASL(-7): invalid parameter supplied». IONOS no lo anuncia.
+#
+# Timeout 120: con los 20 s por defecto, forwardemail cortó la primera subida
+# grande a los 1.564 correos (11 oct). Al relanzar no se duplicó nada: mbsync
+# encuentra en el servidor lo que quedó a medias.
 
 set -uo pipefail
 
@@ -142,6 +146,7 @@ Pass $(cita "$clave")
 TLSType IMAPS
 AuthMechs PLAIN
 PipelineDepth 1
+Timeout 120
 
 IMAPStore $canal-forwardemail
 Account $canal
