@@ -1,0 +1,65 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Zona DNS de rhinopaint.es en Route 53, para poder cancelar IONOS. El dominio
+  está registrado en GoDaddy (cliente 205010754) y su DNS vivía en IONOS
+  (ns1045.ui-dns.*). Copia de la zona de IONOS del 31 oct 2026 sin el include
+  de IONOS en el SPF. Entra en servicio al poner en GoDaddy los servidores de
+  la salida ServidoresDNS.
+
+Resources:
+  Zona:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: rhinopaint.es
+      HostedZoneConfig:
+        Comment: rhinopaint.es (antes en IONOS)
+
+  # La web vieja sigue en el webspace de IONOS hasta que acabe el contrato
+  # (27/12/2026). Después esa IP deja de ser nuestra: borrar estos registros.
+  Web:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref Zona
+      RecordSets:
+        - {Name: rhinopaint.es., Type: A, TTL: '3600', ResourceRecords: [217.160.0.235]}
+        - {Name: rhinopaint.es., Type: AAAA, TTL: '3600', ResourceRecords: ['2001:8d8:100f:f000::25c']}
+        - {Name: www.rhinopaint.es., Type: A, TTL: '3600', ResourceRecords: [217.160.0.235]}
+        - {Name: www.rhinopaint.es., Type: AAAA, TTL: '3600', ResourceRecords: ['2001:8d8:100f:f000::25c']}
+
+  # Correo en forwardemail.net (buzón info@rhinopaint.es).
+  Correo:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref Zona
+      RecordSets:
+        - Name: rhinopaint.es.
+          Type: MX
+          TTL: '3600'
+          ResourceRecords: ['0 mx1.forwardemail.net.', '0 mx2.forwardemail.net.']
+        - Name: rhinopaint.es.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=spf1 include:spf.forwardemail.net include:spf.emdlv.net ~all"'
+            - '"forward-email-site-verification=UkGTMcbySz"'
+        - Name: _dmarc.rhinopaint.es.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=DMARC1; p=none; pct=100; rua=mailto:dmarc-6ac6af6415cb79f3d3b6a050@forwardemail.net;"'
+        # Selector leído de la firma de un correo enviado por forwardemail.
+        - Name: fe-a72d054a80._domainkey.rhinopaint.es.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDWqowC2aJ+a9boxocNqbpH81RoG52eds/FpQaw9TCcLJOfztD8wJpSyRthnD8aGkf2HvHE8t2lwaIjvrua8U4aoN23DZLWKJuKIJeFLDmgkoOA+3thwVPuAraLsRVqXObB2xs7my3IJNlJBXe00BPAQuiYz6J3rGaR/ydQ1WTwWQIDAQAB"'
+        - {Name: fe-bounces.rhinopaint.es., Type: CNAME, TTL: '3600', ResourceRecords: [forwardemail.net.]}
+        - {Name: autodiscover.rhinopaint.es., Type: CNAME, TTL: '3600', ResourceRecords: [autodiscover.forwardemail.net.]}
+        - {Name: autoconfig.rhinopaint.es., Type: CNAME, TTL: '3600', ResourceRecords: [autoconfig.forwardemail.net.]}
+
+Outputs:
+  ZonaId:
+    Value: !Ref Zona
+  ServidoresDNS:
+    Description: Los cuatro que hay que poner en GoDaddy
+    Value: !Join [' ', !GetAtt Zona.NameServers]
