@@ -6,6 +6,11 @@ Description: >
   de IONOS en el SPF. Entra en servicio al poner en GoDaddy los servidores de
   la salida ServidoresDNS.
 
+Parameters:
+  DistribucionDominio:
+    Type: String
+    Default: d1onywgi7xa8at.cloudfront.net   # salida del stack rhinopaint-web
+
 Resources:
   Zona:
     Type: AWS::Route53::HostedZone
@@ -14,17 +19,27 @@ Resources:
       HostedZoneConfig:
         Comment: rhinopaint.es (antes en IONOS)
 
-  # La web vieja sigue en el webspace de IONOS hasta que acabe el contrato
-  # (27/12/2026). Después esa IP deja de ser nuestra: borrar estos registros.
+  # La web es la copia estática del WordPress de IONOS, en S3 + CloudFront
+  # (stack rhinopaint-web, carpeta rhinopaint/). Desde el 03/11/2026 ya no
+  # depende de IONOS. Z2FDTNDATAQYW2 es la zona fija de todas las
+  # distribuciones de CloudFront.
   Web:
     Type: AWS::Route53::RecordSetGroup
     Properties:
       HostedZoneId: !Ref Zona
       RecordSets:
-        - {Name: rhinopaint.es., Type: A, TTL: '3600', ResourceRecords: [217.160.0.235]}
-        - {Name: rhinopaint.es., Type: AAAA, TTL: '3600', ResourceRecords: ['2001:8d8:100f:f000::25c']}
-        - {Name: www.rhinopaint.es., Type: A, TTL: '3600', ResourceRecords: [217.160.0.235]}
-        - {Name: www.rhinopaint.es., Type: AAAA, TTL: '3600', ResourceRecords: ['2001:8d8:100f:f000::25c']}
+        - Name: rhinopaint.es.
+          Type: A
+          AliasTarget: {DNSName: !Ref DistribucionDominio, HostedZoneId: Z2FDTNDATAQYW2}
+        - Name: rhinopaint.es.
+          Type: AAAA
+          AliasTarget: {DNSName: !Ref DistribucionDominio, HostedZoneId: Z2FDTNDATAQYW2}
+        - Name: www.rhinopaint.es.
+          Type: A
+          AliasTarget: {DNSName: !Ref DistribucionDominio, HostedZoneId: Z2FDTNDATAQYW2}
+        - Name: www.rhinopaint.es.
+          Type: AAAA
+          AliasTarget: {DNSName: !Ref DistribucionDominio, HostedZoneId: Z2FDTNDATAQYW2}
 
   # Correo en forwardemail.net (buzón info@rhinopaint.es).
   Correo:
