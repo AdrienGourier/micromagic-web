@@ -1,9 +1,10 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   Zona DNS de micromagic.es en Route 53, para poder cancelar IONOS. El dominio
-  está registrado en GoDaddy (no: lo está en IONOS; se transfiere a Route 53) y su DNS vivía en IONOS
-  (ns1045.ui-dns.*). Copia de la zona de IONOS del 31 oct 2026 sin el include
-  de IONOS en el SPF. Entra en servicio al poner en GoDaddy los servidores de
+  está registrado en IONOS (dentro del contrato 85925345) y se transfiere a
+  Route 53 Domains. Copia de la zona de IONOS del 3 nov 2026 sin el include de
+  IONOS en el SPF ni sus registros internos (_domainconnect, _dep_ws_mutex).
+  Entra en servicio cuando el dominio llegue a Route 53 con los servidores de
   la salida ServidoresDNS.
 
 Resources:
@@ -47,8 +48,12 @@ Resources:
           TTL: '3600'
           ResourceRecords:
             - '"v=DMARC1; p=none; pct=100; rua=mailto:dmarc-6ac6af7915cb79f3d3b6a099@forwardemail.net;"'
-        # DKIM: falta el selector de forwardemail de micromagic.es (sin buzón propio).
-        # Leerlo en el panel de DNS de IONOS antes de cambiar los servidores.
+        # Selector leído del panel de DNS de IONOS (3 nov 2026).
+        - Name: fe-c72b73a316._domainkey.micromagic.es.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDNpgQdxh5o5Sw3kmn3F8c7vBRk2t8WcFpUiLycZc2hewO/GLe741tilEEJl1Sq96HQNZqHKP5bX1QgasC5e7Z9YoQL4Evdma7R1Y18A0IVur/Cf051MEbXoBlpNYsVLe+n2CSUHZQKQfud+wekFAzLVdlvEtazcsc2HLl1oSY/AQIDAQAB"'
         - {Name: fe-bounces.micromagic.es., Type: CNAME, TTL: '3600', ResourceRecords: [forwardemail.net.]}
         - {Name: autodiscover.micromagic.es., Type: CNAME, TTL: '3600', ResourceRecords: [autodiscover.forwardemail.net.]}
         - {Name: autoconfig.micromagic.es., Type: CNAME, TTL: '3600', ResourceRecords: [autoconfig.forwardemail.net.]}
