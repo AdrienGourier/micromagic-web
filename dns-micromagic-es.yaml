@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Zona DNS de micromagic.es en Route 53, para poder cancelar IONOS. El dominio
+  está registrado en IONOS (dentro del contrato 85925345) y se transfiere a
+  Route 53 Domains. Copia de la zona de IONOS del 3 nov 2026 sin el include de
+  IONOS en el SPF ni sus registros internos (_domainconnect, _dep_ws_mutex).
+  Entra en servicio cuando el dominio llegue a Route 53 con los servidores de
+  la salida ServidoresDNS.
+
+Resources:
+  Zona:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: micromagic.es
+      HostedZoneConfig:
+        Comment: micromagic.es (antes en IONOS)
+
+  # La web vieja sigue en el webspace de IONOS hasta que acabe el contrato
+  # (27/12/2026). Después esa IP deja de ser nuestra: borrar estos registros.
+  Web:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref Zona
+      RecordSets:
+        - {Name: micromagic.es., Type: A, TTL: '3600', ResourceRecords: [217.160.0.235]}
+        - {Name: micromagic.es., Type: AAAA, TTL: '3600', ResourceRecords: ['2001:8d8:100f:f000::25c']}
+        - {Name: www.micromagic.es., Type: A, TTL: '3600', ResourceRecords: [217.160.0.235]}
+        - {Name: www.micromagic.es., Type: AAAA, TTL: '3600', ResourceRecords: ['2001:8d8:100f:f000::25c']}
+
+  # Correo en forwardemail.net (solo reenvíos).
+  Correo:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref Zona
+      RecordSets:
+        - Name: micromagic.es.
+          Type: MX
+          TTL: '3600'
+          ResourceRecords: ['0 mx1.forwardemail.net.', '0 mx2.forwardemail.net.']
+        - Name: micromagic.es.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=spf1 include:spf.forwardemail.net ~all"'
+            - '"forward-email-site-verification=Q8j8SWxtZc"'
+        - Name: _dmarc.micromagic.es.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=DMARC1; p=none; pct=100; rua=mailto:dmarc-6ac6af7915cb79f3d3b6a099@forwardemail.net;"'
+        # Selector leído del panel de DNS de IONOS (3 nov 2026).
+        - Name: fe-c72b73a316._domainkey.micromagic.es.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDNpgQdxh5o5Sw3kmn3F8c7vBRk2t8WcFpUiLycZc2hewO/GLe741tilEEJl1Sq96HQNZqHKP5bX1QgasC5e7Z9YoQL4Evdma7R1Y18A0IVur/Cf051MEbXoBlpNYsVLe+n2CSUHZQKQfud+wekFAzLVdlvEtazcsc2HLl1oSY/AQIDAQAB"'
+        - {Name: fe-bounces.micromagic.es., Type: CNAME, TTL: '3600', ResourceRecords: [forwardemail.net.]}
+        - {Name: autodiscover.micromagic.es., Type: CNAME, TTL: '3600', ResourceRecords: [autodiscover.forwardemail.net.]}
+        - {Name: autoconfig.micromagic.es., Type: CNAME, TTL: '3600', ResourceRecords: [autoconfig.forwardemail.net.]}
+
+Outputs:
+  ZonaId:
+    Value: !Ref Zona
+  ServidoresDNS:
+    Description: Los cuatro que hay que poner en el registrador
+    Value: !Join [' ', !GetAtt Zona.NameServers]

@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Zona DNS de micromagic.tv en Route 53, para poder cancelar IONOS. El dominio
+  está registrado en GoDaddy y su DNS vivía en IONOS (ns1045.ui-dns.*): al dar
+  de baja el hosting esa zona desaparece. Copia registro a registro la zona de
+  IONOS del 30 oct 2026, con dos cambios: la web apunta a CloudFront en vez del
+  WordPress viejo, y el SPF ya no incluye IONOS. Entra en servicio cuando se
+  cambian los servidores DNS en GoDaddy por los de la salida ServidoresDNS.
+
+Parameters:
+  DistribucionDominio:
+    Type: String
+    Default: d677xh5eyelbe.cloudfront.net
+
+Resources:
+  Zona:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: micromagic.tv
+      HostedZoneConfig:
+        Comment: micromagic.tv (antes en IONOS)
+
+  # Z2FDTNDATAQYW2 es la zona fija de todas las distribuciones de CloudFront.
+  WebA:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref Zona
+      RecordSets:
+        - Name: micromagic.tv.
+          Type: A
+          AliasTarget: {DNSName: !Ref DistribucionDominio, HostedZoneId: Z2FDTNDATAQYW2}
+        - Name: micromagic.tv.
+          Type: AAAA
+          AliasTarget: {DNSName: !Ref DistribucionDominio, HostedZoneId: Z2FDTNDATAQYW2}
+        - Name: www.micromagic.tv.
+          Type: A
+          AliasTarget: {DNSName: !Ref DistribucionDominio, HostedZoneId: Z2FDTNDATAQYW2}
+        - Name: www.micromagic.tv.
+          Type: AAAA
+          AliasTarget: {DNSName: !Ref DistribucionDominio, HostedZoneId: Z2FDTNDATAQYW2}
+
+  # Validación del certificado ACM: si se borra, el certificado no se renueva
+  # y la web deja de servir HTTPS en abril de 2027.
+  Certificado:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref Zona
+      RecordSets:
+        - Name: _088b9cab804a687c337c94f22cddb785.micromagic.tv.
+          Type: CNAME
+          TTL: '3600'
+          ResourceRecords: [_4b14b3dd407ca033a261b936a16a746d.wzccmgtwzk.acm-validations.aws.]
+        - Name: _30e9295e99eadb14cc5cece9df4a664c.www.micromagic.tv.
+          Type: CNAME
+          TTL: '3600'
+          ResourceRecords: [_7ffb04179d0a90ef95d1f3c85ab2337b.wzccmgtwzk.acm-validations.aws.]
+
+  # Correo en forwardemail.net.
+  Correo:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      HostedZoneId: !Ref Zona
+      RecordSets:
+        - Name: micromagic.tv.
+          Type: MX
+          TTL: '3600'
+          ResourceRecords: ['0 mx1.forwardemail.net.', '0 mx2.forwardemail.net.']
+        # spf.emdlv.net se mantiene: estaba autorizado y nadie sabe qué lo usa.
+        - Name: micromagic.tv.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=spf1 include:spf.forwardemail.net include:spf.emdlv.net ~all"'
+            - '"forward-email-site-verification=Vyk6hno6Ip"'
+        - Name: _dmarc.micromagic.tv.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=DMARC1; p=none; pct=100; rua=mailto:dmarc-6aae8300ce69e8ac70116283@forwardemail.net;"'
+        - Name: fe-47f6f77bc0._domainkey.micromagic.tv.
+          Type: TXT
+          TTL: '3600'
+          ResourceRecords:
+            - '"v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDDk5QktWWVE1rC7Q2/z8CBXags00087iPFU9WICLGU51Kny1r20dEq771PZIo8sWBhjWUXAddyoXH9QrRxYq53bpusdCqz7QDNJl2x+/2o2DZdZgihk/CGgEW+kphJF++vvd0aNEmd6WEMBZ/7sv/KEASieofmN9ursoCo21LWoQIDAQAB"'
+        - Name: fe-bounces.micromagic.tv.
+          Type: CNAME
+          TTL: '3600'
+          ResourceRecords: [forwardemail.net.]
+        - Name: autodiscover.micromagic.tv.
+          Type: CNAME
+          TTL: '3600'
+          ResourceRecords: [autodiscover.forwardemail.net.]
+        - Name: autoconfig.micromagic.tv.
+          Type: CNAME
+          TTL: '3600'
+          ResourceRecords: [autoconfig.forwardemail.net.]
+
+Outputs:
+  ZonaId:
+    Value: !Ref Zona
+  ServidoresDNS:
+    Description: Los cuatro que hay que poner en GoDaddy
+    Value: !Join [' ', !GetAtt Zona.NameServers]

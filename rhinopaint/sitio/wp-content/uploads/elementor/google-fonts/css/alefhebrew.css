@@ -1,0 +1,23 @@
+/* 
+ * Alef Hebrew (Hebrew) http://www.google.com/fonts/earlyaccess
+ */
+@font-face {
+  font-family: 'Alef Hebrew';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-regular.eot);
+  src: url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-regular.eot?#iefix) format('embedded-opentype'),
+       url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-regular.woff2) format('woff2'),
+       url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-regular.woff) format('woff'),
+       url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-regular.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Alef Hebrew';
+  font-style: normal;
+  font-weight: 700;
+  src: url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-bold.eot);
+  src: url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-bold.eot?#iefix) format('embedded-opentype'),
+       url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-bold.woff2) format('woff2'),
+       url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-bold.woff) format('woff'),
+       url(/wp-content/uploads/elementor/google-fonts/fonts/alefhebrew-alef-bold.ttf) format('truetype');
+}
